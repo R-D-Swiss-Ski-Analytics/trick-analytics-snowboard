@@ -2606,7 +2606,7 @@ function renderStandort() {
   const bList = sbData.filter(e => e.status === 'mastered');
   const zList = sbData.filter(e => e.status === 'goal');
 
-  const DIR_ORDER = ['Left','Right','Switch Left','Switch Right'];
+  const DIR_ORDER = ['Frontside','Backside','Cab','Switch Backside'];
   const DIR_COLORS = {'Frontside':'#39c3d4','Backside':'#3b82f6','Cab':'#a78bfa','Switch Backside':'#f59e0b'};
 
   function normDir4(d) {
@@ -3844,4 +3844,3 @@ document.getElementById('f-datum').valueAsDate = new Date();
 
 </body>
 </html>
-<!-- test deploy Tue Jun  2 16:27:59 CEST 2026 -->

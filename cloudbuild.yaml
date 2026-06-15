@@ -1,0 +1,43 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    id: Build
+    args:
+      - build
+      - --tag=europe-west6-docker.pkg.dev/$PROJECT_ID/dataflow/trick-collector:$BUILD_ID
+      - --tag=europe-west6-docker.pkg.dev/$PROJECT_ID/dataflow/trick-collector:latest
+      - --cache-from=europe-west6-docker.pkg.dev/$PROJECT_ID/dataflow/trick-collector:latest
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    id: Push-sha
+    args: [push, "europe-west6-docker.pkg.dev/$PROJECT_ID/dataflow/trick-collector:$BUILD_ID"]
+
+  - name: gcr.io/cloud-builders/docker
+    id: Push-latest
+    args: [push, "europe-west6-docker.pkg.dev/$PROJECT_ID/dataflow/trick-collector:latest"]
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: Deploy
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - trick-collector
+      - --image=europe-west6-docker.pkg.dev/$PROJECT_ID/dataflow/trick-collector:$BUILD_ID
+      - --region=europe-west6
+      - --service-account=trick-collector-sa@$PROJECT_ID.iam.gserviceaccount.com
+      - --allow-unauthenticated
+      - --memory=512Mi
+      - --cpu=1
+      - --min-instances=0
+      - --max-instances=4
+      - --concurrency=40
+      - --timeout=60
+      - --set-env-vars=GCP_PROJECT_ID=$PROJECT_ID,BQ_LOCATION=europe-west6,BQ_DATASET=trick_collector,MD5_SECRET_NAME=trick-collector-md5
+
+images:
+  - europe-west6-docker.pkg.dev/$PROJECT_ID/dataflow/trick-collector:$BUILD_ID
+  - europe-west6-docker.pkg.dev/$PROJECT_ID/dataflow/trick-collector:latest
+
+options:
+  logging: CLOUD_LOGGING_ONLY

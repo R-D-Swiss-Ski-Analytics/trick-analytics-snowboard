@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trick Collector Snowboard</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -1183,21 +1182,89 @@
 </div>
 
 <script>
-// ── SUPABASE ─────────────────────────────────────────────────────
-const SUPABASE_URL = 'https://oevjddfliqhtfvutllyf.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_38nueBUPcuSqwqK8QMI3VQ_rzohaNmh';
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-document.addEventListener('DOMContentLoaded',()=>{const o=document.getElementById('login-overlay');if(o)o.style.display='none';currentRole='coach';initApp('coach');});
+// ── BACKEND API (replaces Supabase) ──────────────────────────────
+// Auth = signed-URL token in the query string (?id_coach=.. / ?id_athlete=..),
+// forwarded on every request. A thin Supabase-compatible `db` shim keeps the
+// existing .from(table).select()/.insert()/.update()/.delete() call sites intact.
+const AUTH_QS = location.search.replace(/^\?/, '');
+function apiUrl(path, params){
+  const u = new URLSearchParams(AUTH_QS);
+  for (const [k,v] of Object.entries(params||{})) if (v!=null) u.set(k, v);
+  const qs = u.toString();
+  return '/api/' + path + (qs ? '?' + qs : '');
+}
+async function apiFetch(method, url, body){
+  const opt = { method, headers:{} };
+  if (body !== undefined){ opt.headers['Content-Type']='application/json'; opt.body=JSON.stringify(body); }
+  let r;
+  try { r = await fetch(url, opt); } catch(e){ return {data:null, error:{message:String(e)}}; }
+  if (r.status === 204) return {data:null, error:null};
+  let payload=null; try { payload = await r.json(); } catch(_) {}
+  if (!r.ok) return {data:null, error:{message:(payload && (payload.detail||payload.message)) || r.statusText}};
+  return {data:payload, error:null};
+}
+class Q {
+  constructor(table){ this.table=table; this.op='select'; this.payload=null; this.filters={}; this.orParam=null; this.limitN=null; }
+  select(){ return this; }              // first call starts a read; chained after insert() is a no-op
+  insert(obj){ this.op='insert'; this.payload=obj; return this; }
+  update(obj){ this.op='update'; this.payload=obj; return this; }
+  delete(){ this.op='delete'; return this; }
+  eq(col,val){ this.filters[col]=val; return this; }
+  or(expr){ this.orParam=expr; return this; }
+  order(){ return this; }                // server applies the default ordering
+  limit(n){ this.limitN=n; return this; }
+  single(){ this._single=true; return this; }
+  then(resolve, reject){ return this._run().then(resolve, reject); }
+  async _run(){
+    const t = this.table;
+    if (this.op === 'insert') return apiFetch('POST', apiUrl(t, {}), this.payload);
+    if (this.op === 'update') return apiFetch('PATCH', apiUrl(t+'/'+encodeURIComponent(this.filters.id), {}), this.payload);
+    if (this.op === 'delete') return apiFetch('DELETE', apiUrl(t+'/'+encodeURIComponent(this.filters.id), {}));
+    // select
+    const params = {};
+    if (this.filters.athlet != null) params.athlet = this.filters.athlet;
+    if (this.limitN != null) params.limit = this.limitN;
+    const res = await apiFetch('GET', apiUrl(t, params));
+    if (res.error) return res;
+    let data = res.data || [];
+    if (this.filters.id != null) data = data.filter(r => r.id === this.filters.id);
+    if (this.orParam){
+      const allowed = this.orParam.split(',').map(s => s.split('.').pop());
+      data = data.filter(r => allowed.includes(r.status));
+    }
+    if (this._single) return {data: data[0] || null, error: null};
+    return {data, error:null};
+  }
+}
+const db = { from(table){ return new Q(table); } };
 
-const COACH_PW = 'SnowboardCoach26';
-let currentRole=null,currentAthlete=null;
-setTimeout(()=>{const s=document.getElementById('login-subtitle');if(s)s.textContent='SNOWBOARD';document.getElementById('coach-pw')?.addEventListener('keydown',e=>{if(e.key==='Enter')doCoachLogin();});},0);
-function showModeSelect(){document.getElementById('mode-select').style.display='block';['coach-login','athlete-login','change-pin-dialog'].forEach(id=>document.getElementById(id).style.display='none');}
-function selectMode(m){document.getElementById('mode-select').style.display='none';document.getElementById(m==='coach'?'coach-login':'athlete-login').style.display='block';}
-function doCoachLogin(){const pw=document.getElementById('coach-pw').value,err=document.getElementById('coach-err');if(pw===COACH_PW){currentRole='coach';document.getElementById('login-overlay').style.display='none';initApp('coach');}else{err.style.display='block';document.getElementById('coach-pw').value='';}}
-async function doAthleteLogin(){const athlet=document.getElementById('login-athlet').value,pin=document.getElementById('athlete-pin').value,err=document.getElementById('athlete-err');if(!athlet){err.textContent='Please select your name.';err.style.display='block';return;}const{data,error}=await db.from('athlete_pins').select('*').eq('athlet',athlet).single();if(error||!data||data.pin!==pin){err.style.display='block';document.getElementById('athlete-pin').value='';return;}currentAthlete=athlet;currentRole='athlete';if(data.must_change){document.getElementById('athlete-login').style.display='none';document.getElementById('change-pin-dialog').style.display='block';}else{document.getElementById('login-overlay').style.display='none';initApp('athlete');}}
-async function saveNewPin(){const p1=document.getElementById('new-pin1').value,p2=document.getElementById('new-pin2').value,err=document.getElementById('pin-err');if(p1.length<4){err.textContent='Minimum 4 characters.';err.style.display='block';return;}if(p1!==p2){err.textContent='PINs do not match.';err.style.display='block';return;}await db.from('athlete_pins').update({pin:p1,must_change:false}).eq('athlet',currentAthlete);document.getElementById('login-overlay').style.display='none';initApp('athlete');}
+// ── AUTH / BOOTSTRAP ─────────────────────────────────────────────
+let currentRole=null,currentAthlete=null,currentUser=null;
+function showAccessDenied(msg){
+  const o=document.getElementById('login-overlay');
+  if(o){ o.innerHTML='<div style="color:#fff;font-family:Poppins,sans-serif;text-align:center;padding:40px;"><div style="font-size:24px;font-weight:800;">🙅 No access</div><div style="margin-top:14px;color:#8fa6bd;font-size:14px;">'+(msg||'Open this app via your personal link.')+'</div></div>'; o.style.display='flex'; }
+}
+function populateAthletePickers(names){
+  ['edit-athlet','sb-athlet','cp-athlet','ev-athlet','tu-athlet','nb-athlet','anb-athlet'].forEach(id=>{
+    const sel=document.getElementById(id); if(!sel) return;
+    const ph=sel.querySelector('option[value=""]');
+    sel.innerHTML=(ph?ph.outerHTML:'')+names.map(n=>'<option>'+n+'</option>').join('');
+  });
+}
+async function bootstrap(){
+  if(!/(\?|&)(id_coach|id_athlete)=/.test(location.search)){ showAccessDenied('Missing access link.'); return; }
+  const res=await apiFetch('GET', apiUrl('me', {}));
+  if(res.error || !res.data){ showAccessDenied(res.error && res.error.message); return; }
+  currentUser=res.data; currentRole=res.data.role;
+  window.SQUAD_ATHLETES=(res.data.athletes||[]).map(a=>a.name);
+  if(currentRole==='athlete') currentAthlete=res.data.name;
+  const o=document.getElementById('login-overlay'); if(o)o.style.display='none';
+  populateAthletePickers(window.SQUAD_ATHLETES);
+  initApp(currentRole);
+}
+document.addEventListener('DOMContentLoaded', bootstrap);
+// (login overlay, coach password, athlete PIN flow removed — auth is now the
+//  signed-URL token validated by the backend; see bootstrap() above.)
 function initApp(role){
   if(role==='coach'){document.querySelectorAll('.nav-tab').forEach(t=>t.style.display='');addLogoutBtn();}
   else{

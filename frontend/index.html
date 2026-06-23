@@ -3438,6 +3438,13 @@ async function sbSave(status) {
   sbData = [data[0], ...sbData];
   renderStandort();
   toggleSbForm();
+
+  if (sessSelectedAthletes.includes(sbAthlet) && sessAthleteData[sbAthlet]) {
+    const {data:tricks} = await db.from('standort').select('trick_label,disziplin,status')
+      .eq('athlet', sbAthlet).or('status.eq.mastered,status.eq.goal').order('trick_label');
+    if (tricks) sessAthleteData[sbAthlet].tricks = tricks;
+    saveSessionState();
+  }
 }
 
 async function deleteSbEntry(id) {

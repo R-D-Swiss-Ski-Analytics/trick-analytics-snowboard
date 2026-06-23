@@ -1298,7 +1298,13 @@ function doCoachLogin(){const pw=document.getElementById('coach-pw').value,err=d
 async function doAthleteLogin(){const athlet=document.getElementById('login-athlet').value,pin=document.getElementById('athlete-pin').value,err=document.getElementById('athlete-err');if(!athlet){err.textContent='Please select your name.';err.style.display='block';return;}const{data,error}=await db.from('athlete_pins').select('*').eq('athlet',athlet).single();if(error||!data||data.pin!==pin){err.style.display='block';document.getElementById('athlete-pin').value='';return;}currentAthlete=athlet;currentRole='athlete';if(data.must_change){document.getElementById('athlete-login').style.display='none';document.getElementById('change-pin-dialog').style.display='block';}else{document.getElementById('login-overlay').style.display='none';initApp('athlete');}}
 async function saveNewPin(){const p1=document.getElementById('new-pin1').value,p2=document.getElementById('new-pin2').value,err=document.getElementById('pin-err');if(p1.length<4){err.textContent='Minimum 4 characters.';err.style.display='block';return;}if(p1!==p2){err.textContent='PINs do not match.';err.style.display='block';return;}await db.from('athlete_pins').update({pin:p1,must_change:false}).eq('athlet',currentAthlete);document.getElementById('login-overlay').style.display='none';initApp('athlete');}
 function initApp(role){
-  if(role==='coach'){document.querySelectorAll('.nav-tab').forEach(t=>t.style.display='');addLogoutBtn();}
+  if(role==='coach'){
+    document.querySelectorAll('.nav-tab').forEach(t=>t.style.display='');addLogoutBtn();
+    if(localStorage.getItem('sb_session')){
+      const sessBtn=Array.from(document.querySelectorAll('.nav-tab')).find(t=>t.textContent.trim()==='Session');
+      if(sessBtn) sessBtn.click();
+    }
+  }
   else{
     const allowed=['Notebook Athlete','Assessment','Development'];
     document.querySelectorAll('.nav-tab').forEach(t=>{t.style.display=allowed.includes(t.textContent.trim())?'':'none';});

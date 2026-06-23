@@ -2310,13 +2310,64 @@ let sessLog = [];
 let sessType = '';
 let sessStartTime = 0;
 
+function saveSessionState() {
+  const state = {
+    athletes: sessSelectedAthletes,
+    log: sessLog,
+    type: sessType,
+    startTime: sessStartTime,
+    activeAthlete: sessActiveSbAthlete || '',
+    athleteState: {}
+  };
+  sessSelectedAthletes.forEach(name => {
+    const d = sessAthleteData[name];
+    if (d) state.athleteState[name] = { currentTrick: d.currentTrick, stats: {...d.stats} };
+  });
+  localStorage.setItem('sb_session', JSON.stringify(state));
+}
+
+function clearSessionStorage() {
+  localStorage.removeItem('sb_session');
+}
+
+async function restoreSessionState() {
+  const raw = localStorage.getItem('sb_session');
+  if (!raw) return false;
+  try {
+    const state = JSON.parse(raw);
+    if (!state.athletes || !state.athletes.length) { clearSessionStorage(); return false; }
+    sessSelectedAthletes = state.athletes;
+    sessLog = state.log || [];
+    sessType = state.type || '';
+    sessStartTime = state.startTime || Date.now();
+    sessActiveSbAthlete = state.activeAthlete || state.athletes[0];
+    for (const name of sessSelectedAthletes) {
+      const saved = (state.athleteState || {})[name] || {};
+      sessAthleteData[name] = { tricks: [], currentTrick: saved.currentTrick || '', stats: saved.stats || {attempts:0,landed:0,perfect:0} };
+      const {data} = await db.from('standort').select('trick_label,disziplin,status')
+        .eq('athlet', name).or('status.eq.mastered,status.eq.goal').order('trick_label');
+      if (data) sessAthleteData[name].tricks = data;
+    }
+    document.getElementById('sess-setup').style.display = 'none';
+    document.getElementById('sess-live').style.display = 'block';
+    document.getElementById('sess-live-date').textContent =
+      new Date(sessStartTime).toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'})
+      + (sessType ? '  ·  ' + sessType : '');
+    renderLiveSession();
+    renderSessionLog();
+    showToast('Session restored', 'success');
+    return true;
+  } catch(e) { clearSessionStorage(); return false; }
+}
+
 function selectSessType(btn, type) {
   document.querySelectorAll('.sess-type-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   sessType = type;
 }
 
-function initSessionSetup() {
+async function initSessionSetup() {
+  if (await restoreSessionState()) return;
   document.getElementById('sess-date-label').textContent =
     new Date().toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const grid = document.getElementById('sess-athlete-grid');
@@ -2645,6 +2696,7 @@ function startSession() {
     new Date().toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric'})
     + (sessType ? '  ·  ' + sessType : '');
   renderLiveSession();
+  saveSessionState();
 }
 
 let sessActiveSbAthlete = '';
@@ -2747,10 +2799,12 @@ async function logAttempt(name, result) {
   col.style.background = flashColor;
   setTimeout(()=>{ col.style.background=''; }, 250);
 
-  sessLog.unshift({name, trick:d.currentTrick, result,
-    time: new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})});
+  const logEntry = {name, trick:d.currentTrick, result,
+    time: new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})};
+  sessLog.unshift(logEntry);
   renderLiveSession();
   renderSessionLog();
+  saveSessionState();
 
   // Save to DB (non-blocking)
   const gesamt = result==='miss'?3:result==='landed'?7:10;
@@ -2760,7 +2814,10 @@ async function logAttempt(name, result) {
     typ:sessType||'Training', disziplin:trickInfo.disziplin||null,
     trickaufbau:d.currentTrick, gelandet:result==='miss'?'No':'Yes',
     gesamt, ausfuehrung:gesamt, landung:gesamt, setup:gesamt,
-  }).then(({error})=>{ if(error) console.error('Save error:',error); });
+  }).select().then(({data,error})=>{
+    if(error) console.error('Save error:',error);
+    else if(data&&data[0]) { logEntry.dbId=data[0].id; saveSessionState(); }
+  });
 }
 
 function deleteSessLogEntry(idx) {
@@ -2775,6 +2832,7 @@ function deleteSessLogEntry(idx) {
   sessLog.splice(idx, 1);
   renderLiveSession();
   renderSessionLog();
+  saveSessionState();
   if (e.dbId) db.from('tricks').delete().eq('id', e.dbId).then(()=>{});
 }
 
@@ -2794,6 +2852,7 @@ function editSbLogEntry(idx) {
   showToast('Edit mode — re-rate the attempt for ' + shortName(e.name), 'success');
   renderLiveSession();
   renderSessionLog();
+  saveSessionState();
 }
 
 function renderSessionLog() {
@@ -2824,6 +2883,7 @@ function clearSessionSelection() {
 
 function resetSession() {
   sessSelectedAthletes=[]; sessAthleteData={}; sessActiveTricks={}; sessLog=[];
+  clearSessionStorage();
   document.getElementById('sess-setup').style.display='block';
   document.getElementById('sess-live').style.display='none';
   initSessionSetup();
@@ -5341,4 +5401,3 @@ document.addEventListener('DOMContentLoaded', () => updateMobileNav('standort'))
 
 </body>
 </html>
-<!-- auto-deploy test 1782141312 -->

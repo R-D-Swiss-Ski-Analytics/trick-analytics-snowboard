@@ -383,7 +383,7 @@
 </style>
 </head>
 <body>
-<div id="login-overlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#001a2e 0%,#004877 100%);z-index:9999;display:flex;align-items:center;justify-content:center;"><div style="background:#0c1a2b;border:1px solid #1a3450;border-radius:16px;padding:40px;width:100%;max-width:420px;text-align:center;"><div style="font-family:'Poppins',sans-serif;font-size:26px;font-weight:800;color:#fff;margin-bottom:4px;">TRICK COLLECTOR</div><div id="login-subtitle" style="font-size:12px;color:#6b8299;margin-bottom:32px;letter-spacing:1px;"></div><div id="mode-select"><div style="font-size:13px;color:#6b8299;margin-bottom:16px;">Who are you?</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><button onclick="selectMode('coach')" style="padding:18px;background:rgba(0,72,119,0.3);border:1.5px solid #004877;border-radius:10px;color:#39c3d4;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Coach</button><button onclick="selectMode('athlete')" style="padding:18px;background:rgba(45,138,78,0.15);border:1.5px solid #2d8a4e;border-radius:10px;color:#2d8a4e;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Athlete</button></div></div><div id="coach-login" style="display:none;"><div style="font-size:13px;color:#39c3d4;font-weight:600;margin-bottom:20px;">Coach Login</div><input type="password" id="coach-pw" placeholder="Coach password" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><div id="coach-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;">Incorrect password.</div><button onclick="doCoachLogin()" style="width:100%;padding:12px;background:#004877;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Sign In</button><button onclick="showModeSelect()" style="width:100%;padding:10px;background:none;color:#6b8299;border:none;font-size:13px;cursor:pointer;margin-top:8px;">← Back</button></div><div id="athlete-login" style="display:none;"><div style="font-size:13px;color:#2d8a4e;font-weight:600;margin-bottom:20px;">Athlete Login</div><select id="login-athlet" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><option value="">— select your name —</option><option>Alex Lotorto</option><option>Andrina Salis</option><option>Ariane Burri</option><option>Aron Wagner</option><option>Berenice Wicki</option><option>David Hablützel</option><option>Elias Lehner</option><option>Isabelle Lötscher</option><option>Jonas Hasler</option><option>Leonardo Saraiva</option><option>Lura Wick</option><option>Mischa Zürcher</option><option>Nicolas Schütz</option><option>Reef Hasler</option><option>Soha Janett</option><option>Yuna Scheidegger</option></select><input type="password" id="athlete-pin" placeholder="PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;" onkeydown="if(event.key==='Enter')doAthleteLogin()"><div id="athlete-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;">Incorrect PIN.</div><button onclick="doAthleteLogin()" style="width:100%;padding:12px;background:#2d8a4e;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Sign In</button><button onclick="showModeSelect()" style="width:100%;padding:10px;background:none;color:#6b8299;border:none;font-size:13px;cursor:pointer;margin-top:8px;">← Back</button></div><div id="change-pin-dialog" style="display:none;"><div style="font-size:13px;color:#f59e0b;font-weight:600;margin-bottom:8px;">Welcome! Please set your personal PIN.</div><div style="font-size:12px;color:#6b8299;margin-bottom:20px;">Choose a PIN of at least 4 characters.</div><input type="password" id="new-pin1" placeholder="New PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:10px;outline:none;font-family:'Poppins',sans-serif;"><input type="password" id="new-pin2" placeholder="Confirm PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><div id="pin-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;"></div><button onclick="saveNewPin()" style="width:100%;padding:12px;background:#f59e0b;color:#000;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Save PIN & Enter</button></div></div></div>
+<div id="login-overlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#001a2e 0%,#004877 100%);z-index:9999;display:none;align-items:center;justify-content:center;"><div style="background:#0c1a2b;border:1px solid #1a3450;border-radius:16px;padding:40px;width:100%;max-width:420px;text-align:center;"><div style="font-family:'Poppins',sans-serif;font-size:26px;font-weight:800;color:#fff;margin-bottom:4px;">TRICK COLLECTOR</div><div id="login-subtitle" style="font-size:12px;color:#6b8299;margin-bottom:32px;letter-spacing:1px;"></div><div id="mode-select"><div style="font-size:13px;color:#6b8299;margin-bottom:16px;">Who are you?</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><button onclick="selectMode('coach')" style="padding:18px;background:rgba(0,72,119,0.3);border:1.5px solid #004877;border-radius:10px;color:#39c3d4;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Coach</button><button onclick="selectMode('athlete')" style="padding:18px;background:rgba(45,138,78,0.15);border:1.5px solid #2d8a4e;border-radius:10px;color:#2d8a4e;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Athlete</button></div></div><div id="coach-login" style="display:none;"><div style="font-size:13px;color:#39c3d4;font-weight:600;margin-bottom:20px;">Coach Login</div><input type="password" id="coach-pw" placeholder="Coach password" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><div id="coach-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;">Incorrect password.</div><button onclick="doCoachLogin()" style="width:100%;padding:12px;background:#004877;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Sign In</button><button onclick="showModeSelect()" style="width:100%;padding:10px;background:none;color:#6b8299;border:none;font-size:13px;cursor:pointer;margin-top:8px;">← Back</button></div><div id="athlete-login" style="display:none;"><div style="font-size:13px;color:#2d8a4e;font-weight:600;margin-bottom:20px;">Athlete Login</div><select id="login-athlet" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><option value="">— select your name —</option><option>Alex Lotorto</option><option>Andrina Salis</option><option>Ariane Burri</option><option>Aron Wagner</option><option>Berenice Wicki</option><option>David Hablützel</option><option>Elias Lehner</option><option>Isabelle Lötscher</option><option>Jonas Hasler</option><option>Leonardo Saraiva</option><option>Lura Wick</option><option>Mischa Zürcher</option><option>Nicolas Schütz</option><option>Reef Hasler</option><option>Soha Janett</option><option>Yuna Scheidegger</option></select><input type="password" id="athlete-pin" placeholder="PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;" onkeydown="if(event.key==='Enter')doAthleteLogin()"><div id="athlete-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;">Incorrect PIN.</div><button onclick="doAthleteLogin()" style="width:100%;padding:12px;background:#2d8a4e;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Sign In</button><button onclick="showModeSelect()" style="width:100%;padding:10px;background:none;color:#6b8299;border:none;font-size:13px;cursor:pointer;margin-top:8px;">← Back</button></div><div id="change-pin-dialog" style="display:none;"><div style="font-size:13px;color:#f59e0b;font-weight:600;margin-bottom:8px;">Welcome! Please set your personal PIN.</div><div style="font-size:12px;color:#6b8299;margin-bottom:20px;">Choose a PIN of at least 4 characters.</div><input type="password" id="new-pin1" placeholder="New PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:10px;outline:none;font-family:'Poppins',sans-serif;"><input type="password" id="new-pin2" placeholder="Confirm PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><div id="pin-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;"></div><button onclick="saveNewPin()" style="width:100%;padding:12px;background:#f59e0b;color:#000;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Save PIN & Enter</button></div></div></div>
 
 <!-- APP PASSWORD OVERLAY -->
 <div id="app-overlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#001a2e 0%,#004877 100%);z-index:9999;display:none;align-items:center;justify-content:center;">
@@ -2366,9 +2366,6 @@ async function restoreSessionState() {
     for (const name of sessSelectedAthletes) {
       const saved = (state.athleteState || {})[name] || {};
       sessAthleteData[name] = { tricks: [], currentTrick: saved.currentTrick || '', stats: saved.stats || {attempts:0,landed:0,perfect:0} };
-      const {data} = await db.from('standort').select('trick_label,disziplin,status')
-        .eq('athlet', name).or('status.eq.mastered,status.eq.goal').order('trick_label');
-      if (data) sessAthleteData[name].tricks = data;
     }
     document.getElementById('sess-setup').style.display = 'none';
     document.getElementById('sess-live').style.display = 'block';
@@ -2378,6 +2375,12 @@ async function restoreSessionState() {
     renderLiveSession();
     renderSessionLog();
     showToast('Session restored', 'success');
+    // Load tricks from DB in background, then re-render dropdown
+    Promise.all(sessSelectedAthletes.map(async name => {
+      const {data} = await db.from('standort').select('trick_label,disziplin,status')
+        .eq('athlet', name).or('status.eq.mastered,status.eq.goal').order('trick_label');
+      if (data) sessAthleteData[name].tricks = data;
+    })).then(() => renderLiveSession());
     return true;
   } catch(e) { clearSessionStorage(); return false; }
 }
@@ -2760,7 +2763,10 @@ function renderLiveSession() {
 
   const dirOrder = {'Frontside':0,'Backside':1,'Cab':2,'Switch Backside':3};
   const getDirKey = lbl => {
-    for (const d of ['Switch Backside','Frontside','Backside','Cab']) if (lbl.startsWith(d)) return dirOrder[d];
+    for (const d of ['Switch Backside','Frontside','Backside','Cab']) {
+      if (lbl.startsWith(d)) return dirOrder[d];
+      if (lbl.includes(' '+d+' ') || lbl.includes(' '+d)) return dirOrder[d];
+    }
     return 4;
   };
   const sortedTricks = [...(d.tricks||[])].map(t => ({
@@ -2899,21 +2905,27 @@ function cancelSbEdit() {
 async function saveSbLogEdit(idx, newResult) {
   const e = sessLog[idx];
   if (!e) return;
+  const commentEl = document.getElementById('sess-edit-comment');
+  const newComment = commentEl ? commentEl.value.trim() : (e.comment||'');
   const oldResult = e.result;
-  if (oldResult === newResult) { cancelSbEdit(); return; }
+  const ratingChanged = oldResult !== newResult;
+  const commentChanged = newComment !== (e.comment||'');
+  if (!ratingChanged && !commentChanged) { cancelSbEdit(); return; }
   const d = sessAthleteData[e.name];
-  if (d) {
+  if (ratingChanged && d) {
     if (oldResult!=='miss') d.stats.landed--;
     if (oldResult==='perfect') d.stats.perfect--;
     if (newResult!=='miss') d.stats.landed++;
     if (newResult==='perfect') d.stats.perfect++;
   }
   e.result = newResult;
+  e.comment = newComment;
   if (e.dbId) {
     const gesamt = newResult==='miss'?3:newResult==='landed'?7:10;
     await db.from('tricks').update({
       gesamt, ausfuehrung:gesamt, landung:gesamt, setup:gesamt,
-      gelandet:newResult==='miss'?'No':'Yes'
+      gelandet:newResult==='miss'?'No':'Yes',
+      kommentar: newComment || null
     }).eq('id', e.dbId);
   }
   sessEditIdx = -1;
@@ -2934,11 +2946,16 @@ function renderSessionLog() {
     let editRow = '';
     if (isEditing) {
       const btnStyle = (val,col,bg) => `padding:8px 14px;border-radius:8px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:2px solid ${col};background:${e.result===val?col:'transparent'};color:${e.result===val?'#060f1a':col};`;
-      editRow = `<div style="display:flex;gap:8px;align-items:center;padding:8px 12px 4px 38px;flex-wrap:wrap;">
-        <button onclick="saveSbLogEdit(${i},'miss')" style="${btnStyle('miss','#e2001a','rgba(226,0,26,0.15)')}">✗ Failed</button>
-        <button onclick="saveSbLogEdit(${i},'landed')" style="${btnStyle('landed','#2d8a4e','rgba(45,138,78,0.15)')}">✓ Landed</button>
-        <button onclick="saveSbLogEdit(${i},'perfect')" style="${btnStyle('perfect','#39c3d4','rgba(57,195,212,0.15)')}">⭐ Stomped</button>
-        <button onclick="cancelSbEdit()" style="padding:6px 12px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;cursor:pointer;font-family:'Poppins',sans-serif;">Cancel</button>
+      editRow = `<div style="padding:8px 12px 4px 38px;">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+          <button onclick="saveSbLogEdit(${i},'miss')" style="${btnStyle('miss','#e2001a','rgba(226,0,26,0.15)')}">✗ Failed</button>
+          <button onclick="saveSbLogEdit(${i},'landed')" style="${btnStyle('landed','#2d8a4e','rgba(45,138,78,0.15)')}">✓ Landed</button>
+          <button onclick="saveSbLogEdit(${i},'perfect')" style="${btnStyle('perfect','#39c3d4','rgba(57,195,212,0.15)')}">⭐ Stomped</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" id="sess-edit-comment" value="${(e.comment||'').replace(/"/g,'&quot;')}" placeholder="Comment (optional)" style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-family:'Poppins',sans-serif;">
+          <button onclick="cancelSbEdit()" style="padding:6px 12px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;cursor:pointer;font-family:'Poppins',sans-serif;">Cancel</button>
+        </div>
       </div>`;
     }
     return `<div style="border-radius:8px;${isEditing?'background:rgba(57,195,212,0.08);border:1px solid #39c3d433;':''}">
@@ -4563,7 +4580,10 @@ let _sbTaDateTo = '';
 function sortTricksByDir(tricks) {
   const dirOrder = {'Frontside':0,'Backside':1,'Cab':2,'Switch Backside':3};
   const getDir = lbl => {
-    for (const d of ['Switch Backside','Frontside','Backside','Cab']) if (lbl.startsWith(d)) return d;
+    for (const d of ['Switch Backside','Frontside','Backside','Cab']) {
+      if (lbl.startsWith(d)) return d;
+      if (lbl.includes(' '+d+' ') || lbl.includes(' '+d)) return d;
+    }
     return 'Other';
   };
   const sorted = tricks.map(t => ({name:t, dir:getDir(t), rot:extractRotFromLabel(t)}))
@@ -4840,7 +4860,7 @@ function renderSbTrickAnalytics() {
   // ── ALL TRICKS — one chart per trick, scrollable ──────────────────
   if (chosen === '__ALL__') {
     const dirOrder = {'Frontside':0,'Backside':1,'Cab':2,'Switch Backside':3};
-    const getDirAll = lbl => { for (const d of ['Switch Backside','Frontside','Backside','Cab']) if (lbl.startsWith(d)) return d; return 'Other'; };
+    const getDirAll = lbl => { for (const d of ['Switch Backside','Frontside','Backside','Cab']) { if (lbl.startsWith(d) || lbl.includes(' '+d+' ') || lbl.includes(' '+d)) return d; } return 'Other'; };
     const allTricks = [...new Set(baseData.map(t=>t.trickaufbau))]
       .map(t => ({name:t, dir:getDirAll(t), rot:extractRotFromLabel(t)}))
       .sort((a,b) => { const da=dirOrder[a.dir]??4, db=dirOrder[b.dir]??4; return da!==db ? da-db : a.rot-b.rot; });

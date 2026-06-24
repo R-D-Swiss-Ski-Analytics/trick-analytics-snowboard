@@ -4837,51 +4837,71 @@ function renderSbTrickAnalytics() {
     return;
   }
 
-  // ── ALL TRICKS COMPARISON ─────────────────────────────────────────
+  // ── ALL TRICKS — one chart per trick, scrollable ──────────────────
   if (chosen === '__ALL__') {
-    const allTricks = [...new Set(baseData.map(t=>t.trickaufbau))];
+    const dirOrder = {'Frontside':0,'Backside':1,'Cab':2,'Switch Backside':3};
+    const getDirAll = lbl => { for (const d of ['Switch Backside','Frontside','Backside','Cab']) if (lbl.startsWith(d)) return d; return 'Other'; };
+    const allTricks = [...new Set(baseData.map(t=>t.trickaufbau))]
+      .map(t => ({name:t, dir:getDirAll(t), rot:extractRotFromLabel(t)}))
+      .sort((a,b) => { const da=dirOrder[a.dir]??4, db=dirOrder[b.dir]??4; return da!==db ? da-db : a.rot-b.rot; });
     if (!allTricks.length) { el.innerHTML='<div style="color:var(--muted);text-align:center;padding:24px;">No data.</div>'; return; }
-    const palette = ['#39c3d4','#f59e0b','#a78bfa','#3b82f6','#2d8a4e','#e2001a','#ec4899','#84cc16','#f97316','#06b6d4','#8b5cf6','#ef4444'];
-    const allDates = [...new Set(baseData.map(t=>t.datum).filter(Boolean))].sort();
-    const trickLines = allTricks.map((trick,ti) => {
-      const td = baseData.filter(t=>t.trickaufbau===trick);
+    const colQ = v => v>=70?'#2d8a4e':v>=40?'#f59e0b':'#e2001a';
+    let html = `<div style="font-size:12px;color:var(--muted);margin-bottom:12px;">${allTricks.length} tricks</div>`;
+    let lastDir = '';
+    const chartIds = [];
+    allTricks.forEach((tObj,ti) => {
+      if (tObj.dir !== lastDir) {
+        html += `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#39c3d4;margin:${lastDir?'20':'4'}px 0 8px;">${tObj.dir}</div>`;
+        lastDir = tObj.dir;
+      }
+      const td = baseData.filter(t=>t.trickaufbau===tObj.name);
       const byDate = {};
-      td.forEach(t => { if(!t.datum) return; if(!byDate[t.datum]) byDate[t.datum]={att:0,land:0}; byDate[t.datum].att++; if(t.gelandet==='Yes') byDate[t.datum].land++; });
-      const pts = allDates.filter(d=>byDate[d]).map(d=>({d, pct:Math.round(byDate[d].land/byDate[d].att*100), att:byDate[d].att}));
-      return {trick, pts, color: palette[ti % palette.length]};
-    }).filter(l => l.pts.length > 0);
-    const cid = 'ta-all-'+Date.now();
-    const legendHtml = trickLines.map(l => `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 8px 2px 0;font-size:11px;"><span style="width:10px;height:10px;border-radius:50%;background:${l.color};display:inline-block;"></span><span style="color:var(--text);">${l.trick}</span></span>`).join('');
-    el.innerHTML = `<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${allTricks.length} tricks compared</div>
-      <div style="margin-bottom:12px;line-height:1.8;">${legendHtml}</div>
-      <canvas id="${cid}" style="width:100%;"></canvas>`;
+      td.forEach(t => { if(!t.datum) return; if(!byDate[t.datum]) byDate[t.datum]={att:0,land:0,stomped:0}; byDate[t.datum].att++; if(t.gelandet==='Yes') byDate[t.datum].land++; if((t.gesamt||0)>=10) byDate[t.datum].stomped++; });
+      const dates = Object.keys(byDate).sort();
+      const totAtt = td.length, totLand = td.filter(t=>t.gelandet==='Yes').length;
+      const landRate = totAtt ? Math.round(totLand/totAtt*100) : 0;
+      const cid = 'ta-all-'+ti+'-'+Date.now();
+      chartIds.push({cid, dates, byDate});
+      html += `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:600;color:var(--text);">${tObj.name}</span>
+          <span style="font-size:16px;font-weight:800;color:${colQ(landRate)};">${totLand}/${totAtt} <span style="font-size:11px;font-weight:400;">(${landRate}%)</span></span>
+        </div>
+        <canvas id="${cid}" style="width:100%;height:100px;"></canvas>
+      </div>`;
+    });
+    el.innerHTML = html;
     requestAnimationFrame(() => {
-      const canvas = document.getElementById(cid); if(!canvas) return;
-      const dpr = window.devicePixelRatio||1, W = (el.offsetWidth||600)-16, H = 260;
-      canvas.style.width=W+'px'; canvas.style.height=H+'px';
-      canvas.width=W*dpr; canvas.height=H*dpr;
-      const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
-      const pad = {l:42,r:16,t:14,b:40};
-      const dateIdx = {}; allDates.forEach((d,i) => dateIdx[d]=i);
-      const n = allDates.length;
-      const xs = allDates.map((_,i) => pad.l + (n===1?(W-pad.l-pad.r)/2:i/(n-1)*(W-pad.l-pad.r)));
-      const toY = v => pad.t+(1-v/100)*(H-pad.t-pad.b);
-      [0,25,50,75,100].forEach(pct => {
-        const y = toY(pct);
-        ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=1;
-        ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
-        ctx.fillStyle='#6b8299';ctx.font='10px Poppins,sans-serif';ctx.textAlign='right';
-        ctx.fillText(pct+'%',pad.l-5,y+3);
+      chartIds.forEach(({cid, dates, byDate}) => {
+        const canvas = document.getElementById(cid); if(!canvas) return;
+        const dpr = window.devicePixelRatio||1;
+        const W = canvas.parentElement.offsetWidth-28, H = 100;
+        canvas.style.width=W+'px'; canvas.style.height=H+'px';
+        canvas.width=W*dpr; canvas.height=H*dpr;
+        const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
+        const pad = {l:32,r:8,t:8,b:22};
+        const n = dates.length;
+        if (!n) return;
+        const pts = dates.map(d=>({d,pct:Math.round(byDate[d].land/byDate[d].att*100),att:byDate[d].att}));
+        const xs = pts.map((_,i) => pad.l+(n===1?(W-pad.l-pad.r)/2:i/(n-1)*(W-pad.l-pad.r)));
+        const toY = v => pad.t+(1-v/100)*(H-pad.t-pad.b);
+        [0,50,100].forEach(pct => {
+          const y=toY(pct); ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+          ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+        });
+        const barW = Math.max(4,Math.min(12,(W-pad.l-pad.r)/(n*4)));
+        pts.forEach((p,i) => {
+          const by=toY(p.pct), bh=H-pad.b-by;
+          ctx.fillStyle='#39c3d4cc';ctx.fillRect(xs[i]-barW/2,by,barW,bh);
+        });
+        if (pts.length >= 2) {
+          ctx.beginPath();ctx.strokeStyle='#39c3d455';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);
+          pts.forEach((p,i)=>{const y=toY(p.pct);i===0?ctx.moveTo(xs[i],y):ctx.lineTo(xs[i],y);});
+          ctx.stroke();ctx.setLineDash([]);
+        }
+        ctx.textAlign='center';ctx.fillStyle='#6b8299';ctx.font='9px Poppins,sans-serif';
+        pts.forEach((p,i)=>ctx.fillText(p.d.split('-')[2]+'.'+p.d.split('-')[1]+'.',xs[i],H-pad.b+12));
       });
-      trickLines.forEach(line => {
-        const points = line.pts.map(p => ({x:xs[dateIdx[p.d]], y:toY(p.pct)}));
-        if (points.length < 2) { points.forEach(p => { ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle=line.color;ctx.fill(); }); return; }
-        ctx.beginPath(); ctx.strokeStyle=line.color; ctx.lineWidth=2;
-        points.forEach((p,i) => i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)); ctx.stroke();
-        points.forEach(p => { ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fillStyle=line.color;ctx.fill(); });
-      });
-      ctx.textAlign='center'; ctx.fillStyle='#6b8299'; ctx.font='10px Poppins,sans-serif';
-      allDates.forEach((d,i) => { ctx.fillText(d.split('-')[2]+'.'+d.split('-')[1]+'.',xs[i],H-pad.b+14); });
     });
     renderSbRawEntries(baseData, 'all entries');
     return;

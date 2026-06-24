@@ -1823,18 +1823,32 @@ function renderSessionReports() {
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
         <button onclick="openReportPrint(window._srReports[${idx}])" style="padding:6px 12px;border-radius:6px;background:rgba(57,195,212,0.15);border:1px solid #39c3d4;color:#39c3d4;font-family:'Poppins',sans-serif;font-size:12px;cursor:pointer;">View</button>
-        <button onclick="deleteSessionReport(${r.id})" style="padding:6px 8px;border-radius:6px;background:none;border:1px solid #e2001a33;color:#e2001a;font-size:13px;cursor:pointer;">🗑</button>
+        <button onclick="deleteSessionReport(${r.id},false)" title="Delete report only" style="padding:6px 8px;border-radius:6px;background:none;border:1px solid #e2001a33;color:#e2001a;font-size:13px;cursor:pointer;">🗑</button>
+        <button onclick="deleteSessionReport(${r.id},true)" title="Delete report + all trick data" style="padding:6px 8px;border-radius:6px;background:none;border:1px solid #e2001a;color:#e2001a;font-size:11px;cursor:pointer;font-weight:700;">🗑+</button>
       </div>
     </div>`;
   }).join('');
   window._srReports = dbSessionReports;
 }
 
-async function deleteSessionReport(id) {
-  if (!confirm('Delete this session report? This cannot be undone.')) return;
-  const {error} = await db.from('session_reports').delete().eq('id', id);
-  if (error) { showToast('Error: '+error.message, 'error'); return; }
-  showToast('Session report deleted', 'success');
+async function deleteSessionReport(id, withTricks) {
+  const report = dbSessionReports.find(r => r.id === id);
+  if (!withTricks) {
+    if (!confirm('Delete this session report?\n\nOption 1: Click OK to delete ONLY the report.\nTo also delete all trick entries from this session, use the trash + data button.')) return;
+    const {error} = await db.from('session_reports').delete().eq('id', id);
+    if (error) { showToast('Error: '+error.message, 'error'); return; }
+    showToast('Session report deleted', 'success');
+  } else {
+    if (!confirm('Delete this session report AND all trick entries from this session?\n\nThis will permanently remove all data from Development and Database for this date/athletes.')) return;
+    if (report && report.datum && report.athletes) {
+      for (const ath of report.athletes) {
+        await db.from('tricks').delete().eq('athlet', ath).eq('datum', report.datum);
+      }
+    }
+    const {error} = await db.from('session_reports').delete().eq('id', id);
+    if (error) { showToast('Error: '+error.message, 'error'); return; }
+    showToast('Session + all trick entries deleted', 'success');
+  }
   loadDB();
 }
 
@@ -2742,12 +2756,21 @@ function renderLiveSession() {
   const pct = s.attempts ? Math.round((s.landed+s.perfect)/s.attempts*100) : 0;
   const sid = name.replace(/\s/g,'_');
 
-  const trickOptions = [...(d.tricks||[])]
-    .sort((a,b) => extractRotFromLabel(b.trick_label) - extractRotFromLabel(a.trick_label))
-    .map(t => {
-      const lbl = normSbTrick((t.trick_label||'').replace(/\bNone\b/gi,'').replace(/\s{2,}/g,' ').trim());
-      return `<option value="${lbl}" ${lbl===d.currentTrick?'selected':''}>${lbl}${t.status==='goal'?' 🎯':''}</option>`;
-    }).join('');
+  const dirOrder = {'Frontside':0,'Backside':1,'Cab':2,'Switch Backside':3};
+  const getDirKey = lbl => {
+    for (const d of ['Switch Backside','Frontside','Backside','Cab']) if (lbl.startsWith(d)) return dirOrder[d];
+    return 4;
+  };
+  const sortedTricks = [...(d.tricks||[])].map(t => ({
+    ...t, _lbl: normSbTrick((t.trick_label||'').replace(/\bNone\b/gi,'').replace(/\s{2,}/g,' ').trim())
+  })).sort((a,b) => {
+    const da = getDirKey(a._lbl), db = getDirKey(b._lbl);
+    if (da !== db) return da - db;
+    return extractRotFromLabel(a._lbl) - extractRotFromLabel(b._lbl);
+  });
+  const trickOptions = sortedTricks.map(t =>
+    `<option value="${t._lbl}" ${t._lbl===d.currentTrick?'selected':''}>${t._lbl}${t.status==='goal'?' 🎯':''}</option>`
+  ).join('');
 
   const cardHtml = `<div class="card" style="padding:24px;" id="sess-col-${sid}">
     <div style="font-size:28px;font-weight:800;color:#39c3d4;margin-bottom:16px;text-align:center;">${shortName(name)}</div>
@@ -2778,6 +2801,7 @@ function renderLiveSession() {
       <button onclick="logAttempt('${name}','landed')"  style="padding:28px 4px;background:rgba(45,138,78,0.1);border:2px solid #2d8a4e;color:#2d8a4e;border-radius:12px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;line-height:1.6;-webkit-tap-highlight-color:transparent;">✓<br>LANDED</button>
       <button onclick="logAttempt('${name}','perfect')" style="padding:28px 4px;background:rgba(57,195,212,0.1);border:2px solid #39c3d4;color:#39c3d4;border-radius:12px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;line-height:1.6;-webkit-tap-highlight-color:transparent;">⭐<br>STOMPED</button>
     </div>
+    <input type="text" id="sess-comment-${sid}" placeholder="Comment (optional)" style="width:100%;margin-top:10px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-family:'Poppins',sans-serif;">
   </div>`;
 
   cols.innerHTML = tabsHtml + cardHtml;
@@ -2805,7 +2829,12 @@ async function logAttempt(name, result) {
   col.style.background = flashColor;
   setTimeout(()=>{ col.style.background=''; }, 250);
 
-  const logEntry = {name, trick:d.currentTrick, result,
+  const sid = name.replace(/\s/g,'_');
+  const commentEl = document.getElementById('sess-comment-'+sid);
+  const comment = commentEl ? commentEl.value.trim() : '';
+  if (commentEl) commentEl.value = '';
+
+  const logEntry = {name, trick:d.currentTrick, result, comment,
     time: new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})};
   sessLog.unshift(logEntry);
   renderLiveSession();
@@ -2820,6 +2849,7 @@ async function logAttempt(name, result) {
     typ:sessType||'Training', disziplin:trickInfo.disziplin||null,
     trickaufbau:d.currentTrick, gelandet:result==='miss'?'No':'Yes',
     gesamt, ausfuehrung:gesamt, landung:gesamt, setup:gesamt,
+    kommentar: comment || null,
   }).select().then(({data,error})=>{
     if(error) console.error('Save error:',error);
     else if(data&&data[0]) { logEntry.dbId=data[0].id; saveSessionState(); }
@@ -2903,7 +2933,7 @@ function renderSessionLog() {
       <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;${isEditing?'':'background:var(--surface2);border-radius:8px;'}font-size:12px;">
         <span style="color:${c};font-weight:800;font-size:15px;min-width:16px;">${icon}</span>
         <span style="color:#39c3d4;font-weight:600;min-width:60px;">${shortName(e.name)}</span>
-        <span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${normSbTrick(e.trick||'—')}</span>
+        <span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${normSbTrick(e.trick||'—')}${e.comment?` <span style="color:var(--muted);font-size:10px;">— ${e.comment}</span>`:''}</span>
         <span style="color:var(--muted);font-size:11px;">${e.time}</span>
         <button onclick="editSbLogEntry(${i})" title="Edit" style="background:none;border:1px solid ${isEditing?'#39c3d4':'var(--border)'};border-radius:6px;color:${isEditing?'#39c3d4':'var(--muted)'};cursor:pointer;padding:2px 7px;font-size:11px;flex-shrink:0;">✏️</button>
         <button onclick="deleteSessLogEntry(${i})" style="background:none;border:1px solid #e2001a33;border-radius:6px;color:#e2001a;cursor:pointer;font-size:13px;padding:2px 6px;flex-shrink:0;">🗑</button>
@@ -2997,7 +3027,14 @@ function endSession() {
       </div>
       <div>
         <label style="font-size:11px;color:#6b8299;font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">Comments</label>
-        <textarea id="sr-comments" placeholder="Coach notes, observations…" rows="3" style="width:100%;background:#112236;border:1px solid #1a3450;border-radius:8px;color:#e8edf2;padding:9px 12px;font-family:'Poppins',sans-serif;font-size:14px;outline:none;resize:vertical;"></textarea>
+        <textarea id="sr-comments" placeholder="Coach notes, observations…" rows="2" style="width:100%;background:#112236;border:1px solid #1a3450;border-radius:8px;color:#e8edf2;padding:9px 12px;font-family:'Poppins',sans-serif;font-size:14px;outline:none;resize:vertical;"></textarea>
+      </div>
+      <div>
+        <label style="font-size:11px;color:#6b8299;font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">Athlete Notes</label>
+        ${sessSelectedAthletes.map(n => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:12px;font-weight:600;color:#39c3d4;min-width:70px;">${shortName(n)}</span>
+          <input type="text" id="sr-ath-${n.replace(/\\s/g,'_')}" placeholder="Short note…" style="flex:1;background:#112236;border:1px solid #1a3450;border-radius:6px;color:#e8edf2;padding:7px 10px;font-family:'Poppins',sans-serif;font-size:12px;outline:none;">
+        </div>`).join('')}
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:20px;">
@@ -3023,11 +3060,16 @@ async function submitSessionReport(duration) {
   const location = (document.getElementById('sr-location')?.value||'').trim();
   const comments = (document.getElementById('sr-comments')?.value||'').trim();
   const conditions = _srCondition || null;
+  const athleteNotes = {};
+  sessSelectedAthletes.forEach(n => {
+    const v = (document.getElementById('sr-ath-'+n.replace(/\s/g,'_'))?.value||'').trim();
+    if (v) athleteNotes[shortName(n)] = v;
+  });
   document.getElementById('sess-report-modal')?.remove();
-  await saveSessionReport(duration, location, conditions, comments);
+  await saveSessionReport(duration, location, conditions, comments, athleteNotes);
 }
 
-async function saveSessionReport(duration, location, conditions, comments) {
+async function saveSessionReport(duration, location, conditions, comments, athleteNotes) {
   const athleteMap = {};
   sessLog.forEach(e => {
     if (!athleteMap[e.name]) athleteMap[e.name] = {};
@@ -3053,7 +3095,8 @@ async function saveSessionReport(duration, location, conditions, comments) {
     location,
     conditions,
     comments,
-    trick_data: trickData
+    trick_data: trickData,
+    athlete_notes: athleteNotes || {}
   });
 
   if (error) { showToast('Error saving report: ' + error.message, 'error'); }

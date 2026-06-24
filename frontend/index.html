@@ -1346,11 +1346,13 @@ function updateFwdSwBtn(prefix) {
   if (!dirSelect) return;
   if (isClassic) {
     dirSelect.style.display = 'none';
-    if (!btnWrap) {
+    const dirOptions = achse === 'Underflip' ? ['Frontside','Cab'] : ['Forward','Switch'];
+    if (btnWrap) btnWrap.remove();
+    {
       const wrap = document.createElement('div');
       wrap.id = 'fwsw-btns-' + prefix;
       wrap.style.cssText = 'display:flex;gap:8px;margin-top:2px;';
-      ['Forward','Switch'].forEach(val => {
+      dirOptions.forEach(val => {
         const btn = document.createElement('button');
         btn.type='button'; btn.textContent=val; btn.dataset.val=val;
         const isActive = dirSelect.value === val;
@@ -1367,7 +1369,7 @@ function updateFwdSwBtn(prefix) {
         wrap.appendChild(btn);
       });
       dirSelect.parentElement.appendChild(wrap);
-    } else { btnWrap.style.display = 'flex'; }
+    }
   } else {
     dirSelect.style.display = '';
     if (btnWrap) btnWrap.style.display = 'none';
@@ -2768,9 +2770,19 @@ function renderLiveSession() {
     if (da !== db) return da - db;
     return extractRotFromLabel(a._lbl) - extractRotFromLabel(b._lbl);
   });
-  const trickOptions = sortedTricks.map(t =>
-    `<option value="${t._lbl}" ${t._lbl===d.currentTrick?'selected':''}>${t._lbl}${t.status==='goal'?' 🎯':''}</option>`
-  ).join('');
+  let trickOptions = '';
+  let lastDir = -1;
+  const dirNames = ['Frontside','Backside','Cab','Switch Backside','Other'];
+  sortedTricks.forEach(t => {
+    const dir = getDirKey(t._lbl);
+    if (dir !== lastDir) {
+      if (lastDir >= 0) trickOptions += '</optgroup>';
+      trickOptions += `<optgroup label="${dirNames[dir] || 'Other'}">`;
+      lastDir = dir;
+    }
+    trickOptions += `<option value="${t._lbl}" ${t._lbl===d.currentTrick?'selected':''}>${t._lbl}${t.status==='goal'?' 🎯':''}</option>`;
+  });
+  if (lastDir >= 0) trickOptions += '</optgroup>';
 
   const cardHtml = `<div class="card" style="padding:24px;" id="sess-col-${sid}">
     <div style="font-size:28px;font-weight:800;color:#39c3d4;margin-bottom:16px;text-align:center;">${shortName(name)}</div>
@@ -2801,7 +2813,7 @@ function renderLiveSession() {
       <button onclick="logAttempt('${name}','landed')"  style="padding:28px 4px;background:rgba(45,138,78,0.1);border:2px solid #2d8a4e;color:#2d8a4e;border-radius:12px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;line-height:1.6;-webkit-tap-highlight-color:transparent;">✓<br>LANDED</button>
       <button onclick="logAttempt('${name}','perfect')" style="padding:28px 4px;background:rgba(57,195,212,0.1);border:2px solid #39c3d4;color:#39c3d4;border-radius:12px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;line-height:1.6;-webkit-tap-highlight-color:transparent;">⭐<br>STOMPED</button>
     </div>
-    <input type="text" id="sess-comment-${sid}" placeholder="Comment (optional)" style="width:100%;margin-top:10px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-family:'Poppins',sans-serif;">
+    <input type="text" id="sess-comment-${sid}" placeholder="Comment before rating (optional)" style="width:100%;margin-top:10px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-family:'Poppins',sans-serif;">
   </div>`;
 
   cols.innerHTML = tabsHtml + cardHtml;

@@ -2842,23 +2842,43 @@ function deleteSessLogEntry(idx) {
   if (e.dbId) db.from('tricks').delete().eq('id', e.dbId).then(()=>{});
 }
 
+let sessEditIdx = -1;
+
 function editSbLogEntry(idx) {
+  sessEditIdx = sessEditIdx === idx ? -1 : idx;
+  renderSessionLog();
+}
+
+function cancelSbEdit() {
+  sessEditIdx = -1;
+  renderSessionLog();
+}
+
+async function saveSbLogEdit(idx, newResult) {
   const e = sessLog[idx];
   if (!e) return;
-  if (e.dbId) db.from('tricks').delete().eq('id', e.dbId).then(()=>{});
+  const oldResult = e.result;
+  if (oldResult === newResult) { cancelSbEdit(); return; }
   const d = sessAthleteData[e.name];
   if (d) {
-    d.stats.attempts = Math.max(0, d.stats.attempts-1);
-    if (e.result!=='miss') d.stats.landed = Math.max(0, d.stats.landed-1);
-    if (e.result==='perfect') d.stats.perfect = Math.max(0, d.stats.perfect-1);
-    if (e.trick) d.currentTrick = e.trick;
+    if (oldResult!=='miss') d.stats.landed--;
+    if (oldResult==='perfect') d.stats.perfect--;
+    if (newResult!=='miss') d.stats.landed++;
+    if (newResult==='perfect') d.stats.perfect++;
   }
-  sessLog.splice(idx, 1);
-  sessActiveSbAthlete = e.name;
-  showToast('Edit mode — re-rate the attempt for ' + shortName(e.name), 'success');
+  e.result = newResult;
+  if (e.dbId) {
+    const gesamt = newResult==='miss'?3:newResult==='landed'?7:10;
+    await db.from('tricks').update({
+      gesamt, ausfuehrung:gesamt, landung:gesamt, setup:gesamt,
+      gelandet:newResult==='miss'?'No':'Yes'
+    }).eq('id', e.dbId);
+  }
+  sessEditIdx = -1;
   renderLiveSession();
   renderSessionLog();
   saveSessionState();
+  showToast('Rating updated', 'success');
 }
 
 function renderSessionLog() {
@@ -2868,13 +2888,27 @@ function renderSessionLog() {
   el.innerHTML = sessLog.slice(0,30).map((e,i)=>{
     const icon = e.result==='miss'?'✗':e.result==='landed'?'✓':'⭐';
     const c = e.result==='miss'?'#e2001a':e.result==='landed'?'#2d8a4e':'#39c3d4';
-    return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface2);border-radius:8px;font-size:12px;">
-      <span style="color:${c};font-weight:800;font-size:15px;min-width:16px;">${icon}</span>
-      <span style="color:#39c3d4;font-weight:600;min-width:60px;">${shortName(e.name)}</span>
-      <span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${normSbTrick(e.trick||'—')}</span>
-      <span style="color:var(--muted);font-size:11px;">${e.time}</span>
-      <button onclick="editSbLogEntry(${i})" title="Edit" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:2px 7px;font-size:11px;flex-shrink:0;">✏️</button>
-      ${i===0?`<button onclick="deleteSessLogEntry(0)" style="background:none;border:1px solid #e2001a33;border-radius:6px;color:#e2001a;cursor:pointer;font-size:13px;padding:2px 6px;flex-shrink:0;">🗑</button>`:''}
+    const isEditing = sessEditIdx === i;
+    let editRow = '';
+    if (isEditing) {
+      const btnStyle = (val,col,bg) => `padding:8px 14px;border-radius:8px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:2px solid ${col};background:${e.result===val?col:'transparent'};color:${e.result===val?'#060f1a':col};`;
+      editRow = `<div style="display:flex;gap:8px;align-items:center;padding:8px 12px 4px 38px;flex-wrap:wrap;">
+        <button onclick="saveSbLogEdit(${i},'miss')" style="${btnStyle('miss','#e2001a','rgba(226,0,26,0.15)')}">✗ Failed</button>
+        <button onclick="saveSbLogEdit(${i},'landed')" style="${btnStyle('landed','#2d8a4e','rgba(45,138,78,0.15)')}">✓ Landed</button>
+        <button onclick="saveSbLogEdit(${i},'perfect')" style="${btnStyle('perfect','#39c3d4','rgba(57,195,212,0.15)')}">⭐ Stomped</button>
+        <button onclick="cancelSbEdit()" style="padding:6px 12px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;cursor:pointer;font-family:'Poppins',sans-serif;">Cancel</button>
+      </div>`;
+    }
+    return `<div style="border-radius:8px;${isEditing?'background:rgba(57,195,212,0.08);border:1px solid #39c3d433;':''}">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;${isEditing?'':'background:var(--surface2);border-radius:8px;'}font-size:12px;">
+        <span style="color:${c};font-weight:800;font-size:15px;min-width:16px;">${icon}</span>
+        <span style="color:#39c3d4;font-weight:600;min-width:60px;">${shortName(e.name)}</span>
+        <span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${normSbTrick(e.trick||'—')}</span>
+        <span style="color:var(--muted);font-size:11px;">${e.time}</span>
+        <button onclick="editSbLogEntry(${i})" title="Edit" style="background:none;border:1px solid ${isEditing?'#39c3d4':'var(--border)'};border-radius:6px;color:${isEditing?'#39c3d4':'var(--muted)'};cursor:pointer;padding:2px 7px;font-size:11px;flex-shrink:0;">✏️</button>
+        <button onclick="deleteSessLogEntry(${i})" style="background:none;border:1px solid #e2001a33;border-radius:6px;color:#e2001a;cursor:pointer;font-size:13px;padding:2px 6px;flex-shrink:0;">🗑</button>
+      </div>
+      ${editRow}
     </div>`;
   }).join('');
 }

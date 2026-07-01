@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trick Analytics Snowboard</title>
+<title>Trick Analyses Snowboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -383,12 +383,13 @@
 </style>
 </head>
 <body>
-<div id="login-overlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#001a2e 0%,#004877 100%);z-index:9999;display:none;align-items:center;justify-content:center;"><div style="background:#0c1a2b;border:1px solid #1a3450;border-radius:16px;padding:40px;width:100%;max-width:420px;text-align:center;"><div style="font-family:'Poppins',sans-serif;font-size:26px;font-weight:800;color:#fff;margin-bottom:4px;">TRICK COLLECTOR</div><div id="login-subtitle" style="font-size:12px;color:#6b8299;margin-bottom:32px;letter-spacing:1px;"></div><div id="mode-select"><div style="font-size:13px;color:#6b8299;margin-bottom:16px;">Who are you?</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><button onclick="selectMode('coach')" style="padding:18px;background:rgba(0,72,119,0.3);border:1.5px solid #004877;border-radius:10px;color:#39c3d4;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Coach</button><button onclick="selectMode('athlete')" style="padding:18px;background:rgba(45,138,78,0.15);border:1.5px solid #2d8a4e;border-radius:10px;color:#2d8a4e;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Athlete</button></div></div><div id="coach-login" style="display:none;"><div style="font-size:13px;color:#39c3d4;font-weight:600;margin-bottom:20px;">Coach Login</div><input type="password" id="coach-pw" placeholder="Coach password" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><div id="coach-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;">Incorrect password.</div><button onclick="doCoachLogin()" style="width:100%;padding:12px;background:#004877;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Sign In</button><button onclick="showModeSelect()" style="width:100%;padding:10px;background:none;color:#6b8299;border:none;font-size:13px;cursor:pointer;margin-top:8px;">← Back</button></div><div id="athlete-login" style="display:none;"><div style="font-size:13px;color:#2d8a4e;font-weight:600;margin-bottom:20px;">Athlete Login</div><select id="login-athlet" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><option value="">— select your name —</option><option>Alex Lotorto</option><option>Andrina Salis</option><option>Ariane Burri</option><option>Aron Wagner</option><option>Berenice Wicki</option><option>David Hablützel</option><option>Elias Lehner</option><option>Isabelle Lötscher</option><option>Jonas Hasler</option><option>Leonardo Saraiva</option><option>Lura Wick</option><option>Mischa Zürcher</option><option>Nicolas Schütz</option><option>Reef Hasler</option><option>Soha Janett</option><option>Yuna Scheidegger</option></select><input type="password" id="athlete-pin" placeholder="PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;" onkeydown="if(event.key==='Enter')doAthleteLogin()"><div id="athlete-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;">Incorrect PIN.</div><button onclick="doAthleteLogin()" style="width:100%;padding:12px;background:#2d8a4e;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Sign In</button><button onclick="showModeSelect()" style="width:100%;padding:10px;background:none;color:#6b8299;border:none;font-size:13px;cursor:pointer;margin-top:8px;">← Back</button></div><div id="change-pin-dialog" style="display:none;"><div style="font-size:13px;color:#f59e0b;font-weight:600;margin-bottom:8px;">Welcome! Please set your personal PIN.</div><div style="font-size:12px;color:#6b8299;margin-bottom:20px;">Choose a PIN of at least 4 characters.</div><input type="password" id="new-pin1" placeholder="New PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:10px;outline:none;font-family:'Poppins',sans-serif;"><input type="password" id="new-pin2" placeholder="Confirm PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><div id="pin-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;"></div><button onclick="saveNewPin()" style="width:100%;padding:12px;background:#f59e0b;color:#000;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Save PIN & Enter</button></div></div></div>
+<div id="login-overlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#001a2e 0%,#004877 100%);z-index:9999;display:none;align-items:center;justify-content:center;"><div style="background:#0c1a2b;border:1px solid #1a3450;border-radius:16px;padding:40px;width:100%;max-width:420px;text-align:center;"><div style="font-family:'Poppins',sans-serif;font-size:26px;font-weight:800;color:#fff;margin-bottom:4px;">TRICK ANALYSES SNOWBOARD</div><div id="login-subtitle" style="font-size:12px;color:#6b8299;margin-bottom:32px;letter-spacing:1px;"></div><div id="mode-select"><div style="font-size:13px;color:#6b8299;margin-bottom:16px;">Who are you?</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><button onclick="selectMode('coach')" style="padding:18px;background:rgba(0,72,119,0.3);border:1.5px solid #004877;border-radius:10px;color:#39c3d4;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Coach</button><button onclick="selectMode('athlete')" style="padding:18px;background:rgba(45,138,78,0.15);border:1.5px solid #2d8a4e;border-radius:10px;color:#2d8a4e;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Athlete</button></div></div><div id="coach-login" style="display:none;"><div style="font-size:13px;color:#39c3d4;font-weight:600;margin-bottom:20px;">Coach Login</div><input type="password" id="coach-pw" placeholder="Coach password" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><div id="coach-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;">Incorrect password.</div><button onclick="doCoachLogin()" style="width:100%;padding:12px;background:#004877;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Sign In</button><button onclick="showModeSelect()" style="width:100%;padding:10px;background:none;color:#6b8299;border:none;font-size:13px;cursor:pointer;margin-top:8px;">← Back</button></div><div id="athlete-login" style="display:none;"><div style="font-size:13px;color:#2d8a4e;font-weight:600;margin-bottom:20px;">Athlete Login</div><select id="login-athlet" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><option value="">— select your name —</option><option>Alex Lotorto</option><option>Andrina Salis</option><option>Ariane Burri</option><option>Aron Wagner</option><option>Berenice Wicki</option><option>David Hablützel</option><option>Elias Lehner</option><option>Isabelle Lötscher</option><option>Jonas Hasler</option><option>Leonardo Saraiva</option><option>Lura Wick</option><option>Mischa Zürcher</option><option>Nicolas Schütz</option><option>Reef Hasler</option>
+            <option>Robin Zürcher</option><option>Soha Janett</option><option>Yuna Scheidegger</option></select><input type="password" id="athlete-pin" placeholder="PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;" onkeydown="if(event.key==='Enter')doAthleteLogin()"><div id="athlete-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;">Incorrect PIN.</div><button onclick="doAthleteLogin()" style="width:100%;padding:12px;background:#2d8a4e;color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Sign In</button><button onclick="showModeSelect()" style="width:100%;padding:10px;background:none;color:#6b8299;border:none;font-size:13px;cursor:pointer;margin-top:8px;">← Back</button></div><div id="change-pin-dialog" style="display:none;"><div style="font-size:13px;color:#f59e0b;font-weight:600;margin-bottom:8px;">Welcome! Please set your personal PIN.</div><div style="font-size:12px;color:#6b8299;margin-bottom:20px;">Choose a PIN of at least 4 characters.</div><input type="password" id="new-pin1" placeholder="New PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:10px;outline:none;font-family:'Poppins',sans-serif;"><input type="password" id="new-pin2" placeholder="Confirm PIN" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;"><div id="pin-err" style="color:#e2001a;font-size:12px;margin-bottom:10px;display:none;"></div><button onclick="saveNewPin()" style="width:100%;padding:12px;background:#f59e0b;color:#000;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Save PIN & Enter</button></div></div></div>
 
 <!-- APP PASSWORD OVERLAY -->
 <div id="app-overlay" style="position:fixed;inset:0;background:linear-gradient(135deg,#001a2e 0%,#004877 100%);z-index:9999;display:none;align-items:center;justify-content:center;">
   <div style="background:#0c1a2b;border:1px solid #1a3450;border-radius:16px;padding:40px;max-width:360px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.4);">
-    <div style="font-family:'Poppins',sans-serif;font-size:32px;letter-spacing:1px;color:#ffffff;">TRICK COLLECTOR FREESKI</div>
+    <div style="font-family:'Poppins',sans-serif;font-size:32px;letter-spacing:1px;color:#ffffff;">TRICK ANALYSES SNOWBOARD</div>
     <div style="font-size:12px;color:#6b8299;margin-bottom:28px;letter-spacing:1px;">Swiss-Ski</div>
     <input id="app-pw-input" type="password" placeholder="Enter password" style="width:100%;padding:12px 16px;border-radius:8px;border:1px solid #1a3450;background:#112236;color:#e8edf2;font-size:15px;margin-bottom:12px;outline:none;font-family:'Poppins',sans-serif;">
     <div id="app-pw-error" style="color:#ef4444;font-size:12px;margin-bottom:10px;display:none;">Incorrect password.</div>
@@ -397,7 +398,7 @@
 </div>
 
 <header>
-  <h1>Trick Analytics Snowboard</h1>
+  <h1>Trick Analyses Snowboard</h1>
   <nav class="nav-tabs">
     <button class="nav-tab active" onclick="showPage('standort', this)">Assessment</button>
     <button class="nav-tab" onclick="showPage('erfassen', this)">Session</button>
@@ -452,6 +453,7 @@
             <option>Jonas Hasler</option>
             <option>Nicolas Schütz</option>
             <option>Reef Hasler</option>
+            <option>Robin Zürcher</option>
             <option>Yuna Scheidegger</option>
           </optgroup>
           </select></div>
@@ -643,6 +645,7 @@
             <option>Jonas Hasler</option>
             <option>Nicolas Schütz</option>
             <option>Reef Hasler</option>
+            <option>Robin Zürcher</option>
             <option>Yuna Scheidegger</option>
           </optgroup>
           </select>
@@ -694,6 +697,7 @@
             <option>Jonas Hasler</option>
             <option>Nicolas Schütz</option>
             <option>Reef Hasler</option>
+            <option>Robin Zürcher</option>
             <option>Yuna Scheidegger</option>
           </optgroup>
           </select>
@@ -702,7 +706,6 @@
 
   <!-- Empty hint -->
   <div id="sb-empty" style="text-align:center;padding:60px;color:var(--muted);">
-    <div style="font-size:40px;margin-bottom:16px;">🎯</div>
     <div style="font-family:'Poppins',sans-serif;font-size:22px;letter-spacing:0.5px;margin-bottom:8px;">Assessment</div>
     <div style="font-size:13px;">Select an athlete to view the overview.</div>
   </div>
@@ -726,7 +729,7 @@
 
     <!-- Add-entry form (collapsible, same fields as Erfassen) -->
     <div class="card" id="sb-form-card" style="display:none;">
-      <div class="card-title">Trick eintragen</div>
+      <div class="card-title">Add Trick</div>
       <div class="form-grid">
 
         <div class="form-group">
@@ -908,13 +911,13 @@
             <option>Jonas Hasler</option>
             <option>Nicolas Schütz</option>
             <option>Reef Hasler</option>
+            <option>Robin Zürcher</option>
             <option>Yuna Scheidegger</option>
           </optgroup>
           </select>
   </div>
 
   <div id="ev-empty" style="text-align:center;padding:60px;color:var(--muted);">
-    <div style="font-size:40px;margin-bottom:16px;">📊</div>
     <div style="font-family:'Poppins',sans-serif;font-size:22px;letter-spacing:0.5px;margin-bottom:8px;">Development</div>
     <div style="font-size:13px;">Select an athlete to view the analysis.</div>
   </div>
@@ -965,6 +968,7 @@
             <option>Jonas Hasler</option>
             <option>Nicolas Schütz</option>
             <option>Reef Hasler</option>
+            <option>Robin Zürcher</option>
             <option>Yuna Scheidegger</option>
           </optgroup>
           </select>
@@ -1048,6 +1052,7 @@
             <option>Jonas Hasler</option>
             <option>Nicolas Schütz</option>
             <option>Reef Hasler</option>
+            <option>Robin Zürcher</option>
             <option>Yuna Scheidegger</option>
           </optgroup>
           </select>
@@ -1109,6 +1114,7 @@
             <option>Jonas Hasler</option>
             <option>Nicolas Schütz</option>
             <option>Reef Hasler</option>
+            <option>Robin Zürcher</option>
             <option>Yuna Scheidegger</option>
           </optgroup>
           </select>
@@ -1157,7 +1163,7 @@
   <!-- SECTION 1: SESSION PERFORMANCE -->
   <div class="card" style="margin-bottom:20px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-      <div style="font-family:'Poppins',sans-serif;font-size:20px;letter-spacing:0.5px;color:var(--accent);">📊 Team Overview — Session Performance</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:20px;letter-spacing:0.5px;color:var(--accent);">Team Overview — Session Performance</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <div style="display:flex;gap:4px;">
           <button id="pf-all"  onclick="setSbPerfFilter('')"                    style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:Poppins,sans-serif;border:1px solid #39c3d4;background:rgba(57,195,212,0.2);color:#39c3d4;">All</button>
@@ -1188,15 +1194,38 @@
   <!-- SECTION 1b: SESSION REPORTS -->
   <div class="card" style="margin-bottom:20px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-      <div style="font-family:'Poppins',sans-serif;font-size:20px;letter-spacing:0.5px;color:var(--accent2);">📋 Session Reports</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:20px;letter-spacing:0.5px;color:var(--accent2);">Session Reports</div>
     </div>
     <div id="session-reports-list"><div class="loading"><span class="spinner"></span></div></div>
+  </div>
+
+  <!-- SECTION 1c: ATHLETE REPORT -->
+  <div class="card" style="margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <div style="font-family:'Poppins',sans-serif;font-size:20px;letter-spacing:0.5px;color:var(--accent2);">Athlete Report</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <select id="ar-athlete-sel" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-family:'Poppins',sans-serif;min-width:180px;">
+        <option value="">— Select athlete —</option>
+      </select>
+      <select id="ar-season-sel" onchange="arSeasonChange()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-family:'Poppins',sans-serif;">
+        <option value="current">Current season</option>
+        <option value="all">All time</option>
+        <option value="custom">Custom date range</option>
+      </select>
+      <div id="ar-date-range" style="display:none;gap:6px;align-items:center;">
+        <input type="date" id="ar-date-from" style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-family:'Poppins',sans-serif;">
+        <span style="color:var(--muted);font-size:13px;">–</span>
+        <input type="date" id="ar-date-to" style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;font-family:'Poppins',sans-serif;">
+      </div>
+      <button onclick="generateAthleteReport()" style="padding:8px 18px;border-radius:8px;background:rgba(57,195,212,0.15);border:1px solid #39c3d4;color:#39c3d4;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">↓ Generate PDF</button>
+    </div>
   </div>
 
   <!-- SECTION 2: TEAM ASSESSMENT -->
   <div class="card" style="margin-bottom:20px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-      <div style="font-family:'Poppins',sans-serif;font-size:20px;letter-spacing:0.5px;color:var(--accent2);">📋 Team Overview — Assessment</div>
+      <div style="font-family:'Poppins',sans-serif;font-size:20px;letter-spacing:0.5px;color:var(--accent2);">Team Overview — Assessment</div>
       <div style="display:flex;gap:8px;">
         <button onclick="sbRealityCheck()" style="padding:7px 14px;border-radius:8px;font-family:Poppins,sans-serif;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #f59e0b;background:rgba(245,158,11,0.15);color:#f59e0b;">🔍 Reality Check</button>
         
@@ -1255,6 +1284,7 @@
             <option>Jonas Hasler</option>
             <option>Nicolas Schütz</option>
             <option>Reef Hasler</option>
+            <option>Robin Zürcher</option>
             <option>Yuna Scheidegger</option>
           </optgroup>
           </select>
@@ -1542,7 +1572,15 @@ function renderSessionList() {
     return;
   }
 
-  body.innerHTML = filtered.map((t, i) => {
+  const sbDirOrd = {'Frontside':0,'Backside':1,'Cab':2,'Switch Backside':3};
+  const sbGetDir = lbl => { for (const d of ['Switch Backside','Frontside','Backside','Cab']) { if (lbl.includes(d)) return sbDirOrd[d]??4; } return 4; };
+  const sorted = [...filtered].sort((a,b) => {
+    const la = normSbTrick(a.trickaufbau||''), lb = normSbTrick(b.trickaufbau||'');
+    const da = sbGetDir(la), db = sbGetDir(lb);
+    if (da !== db) return da - db;
+    return extractRotFromLabel(la) - extractRotFromLabel(lb);
+  });
+  body.innerHTML = sorted.map((t, i) => {
     const trickName = [t.drehrichtung, t.flips && !['keine','None','none'].includes(t.flips) ? t.flips : null, t.rotation, t.achse, t.grab, t.bringback].filter(Boolean).join(' ') || t.railart || '–';
     const g = t.gesamt;
     const ratingHtml = g ? '<span class="rating-pill ' + (g>=8?'rating-high':g>=6?'rating-mid':'rating-low') + '">' + g + '</span>' : '–';
@@ -1805,7 +1843,203 @@ async function loadDB() {
   renderSessionReports();
   renderDBRankings();
   renderDBTable();
+  autoRebuildAllReports();
 }
+
+let _rebuildInProgress = false;
+async function autoRebuildAllReports() {
+  if (_rebuildInProgress || !dbSessionReports.length) return;
+  _rebuildInProgress = true;
+  for (const report of dbSessionReports) {
+    await rebuildReportFromTimestamps(report.id, true);
+  }
+  _rebuildInProgress = false;
+}
+
+function arSeasonChange() {
+  const v = document.getElementById('ar-season-sel')?.value;
+  const dr = document.getElementById('ar-date-range');
+  if (dr) dr.style.display = v === 'custom' ? 'flex' : 'none';
+}
+
+function populateAthleteReportDropdown() {
+  const sel = document.getElementById('ar-athlete-sel');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Select athlete —</option>'
+    + SESS_ALL_ATHLETES.map(a => `<option value="${a.name}" ${a.name===current?'selected':''}>${a.name}</option>`).join('');
+}
+
+function generateAthleteReport() {
+  const athName = document.getElementById('ar-athlete-sel')?.value;
+  const season  = document.getElementById('ar-season-sel')?.value || 'current';
+  if (!athName) { showToast('Please select an athlete', 'error'); return; }
+
+  const { from } = getSbSeasonRange();
+  let data = dbAllTricks.filter(t => t.athlet === athName && t.trickaufbau);
+  let seasonLabel = 'All time';
+  if (season === 'current' && from) {
+    data = data.filter(t => t.datum >= from);
+    seasonLabel = 'Current season';
+  } else if (season === 'custom') {
+    const dateFrom = document.getElementById('ar-date-from')?.value;
+    const dateTo   = document.getElementById('ar-date-to')?.value;
+    if (!dateFrom && !dateTo) { showToast('Please select a date range', 'error'); return; }
+    if (dateFrom) data = data.filter(t => t.datum >= dateFrom);
+    if (dateTo)   data = data.filter(t => t.datum <= dateTo);
+    const fmt = d => { if (!d) return ''; const p=d.split('-'); return p[2]+'.'+p[1]+'.'+p[0].slice(2); };
+    seasonLabel = (dateFrom ? fmt(dateFrom) : '…') + ' – ' + (dateTo ? fmt(dateTo) : '…');
+  }
+  data.sort((a,b) => (a.created_at||'').localeCompare(b.created_at||''));
+
+  if (!data.length) { showToast('No session data for this athlete / period', 'error'); return; }
+
+  showToast('Generating PDF…', 'success');
+
+  // Build per-trick summary
+  const trickMap = {};
+  data.forEach(e => {
+    const trick = normSbTrick(e.trickaufbau);
+    if (!trickMap[trick]) trickMap[trick] = {att:0,land:0,stomped:0};
+    trickMap[trick].att++;
+    if (e.gelandet==='Yes') trickMap[trick].land++;
+    if ((e.gesamt||0)>=10) trickMap[trick].stomped++;
+  });
+  const trickRows = Object.entries(trickMap)
+    .sort((a,b) => b[1].att - a[1].att)
+    .map(([trick,s]) => {
+      const lp = s.att ? Math.round(s.land/s.att*100) : 0;
+      return [trick, s.att, s.land-(s.stomped||0), s.stomped, lp+'%'];
+    });
+
+  // Build per-session breakdown
+  const sessMap = {};
+  data.forEach(e => {
+    const key = e.datum+'|'+(e.typ||'');
+    if (!sessMap[key]) sessMap[key] = {datum:e.datum, typ:e.typ||'', att:0, land:0};
+    sessMap[key].att++;
+    if (e.gelandet==='Yes') sessMap[key].land++;
+  });
+  const sessRows = Object.values(sessMap)
+    .sort((a,b) => a.datum.localeCompare(b.datum))
+    .map(s => {
+      const p=s.datum.split('-'); const d=p[2]+'.'+p[1]+'.'+p[0].slice(2);
+      const lp = s.att ? Math.round(s.land/s.att*100) : 0;
+      return [d, s.typ||'—', s.att, s.land, lp+'%'];
+    });
+
+  const totalAtt  = data.length;
+  const totalLand = data.filter(e=>e.gelandet==='Yes').length;
+  const totalPct  = totalAtt ? Math.round(totalLand/totalAtt*100) : 0;
+  const filename = 'Athlete_Report_'+athName.replace(/\s/g,'_')+'_'+(new Date().toISOString().split('T')[0].replace(/-/g,''))+'.pdf';
+
+  function generate() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
+    const W=210, margin=16, cw=W-margin*2;
+    let y = margin;
+
+    // Header bar
+    doc.setFillColor(26,26,26);
+    doc.rect(margin, y, cw, 10, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255,255,255);
+    doc.text('ATHLETE REPORT', margin+4, y+6.8);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.setTextColor(180,180,180);
+    doc.text('Swiss-Ski Trick Analyses — Snowboard', W-margin-2, y+6.8, {align:'right'});
+    y += 14;
+
+    // Meta
+    const meta = [['Athlete', athName], ['Period', seasonLabel], ['Sessions', sessRows.length+''],
+                  ['Total Attempts', totalAtt+''], ['Landed+Stomped', totalLand+''], ['Landing Rate', totalPct+'%']];
+    const col = cw/3;
+    doc.setFontSize(7.5);
+    meta.forEach(([label, val], i) => {
+      const cx = margin + (i%3)*col;
+      const cy = y + Math.floor(i/3)*11;
+      doc.setFont('helvetica','normal'); doc.setTextColor(130,130,130);
+      doc.text(label.toUpperCase(), cx, cy);
+      doc.setFont('helvetica','bold'); doc.setTextColor(26,26,26);
+      doc.text(String(val), cx, cy+4.5);
+    });
+    y += 26;
+
+    doc.setDrawColor(220,220,220);
+    doc.line(margin, y, W-margin, y);
+    y += 5;
+
+    // Trick summary table
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(130,130,130);
+    doc.text('TRICK SUMMARY', margin, y); y += 4;
+    doc.autoTable({
+      startY: y, margin:{left:margin,right:margin},
+      head:[['Trick','Att.','Landed','Stomped','Rate']],
+      body: trickRows,
+      theme:'grid',
+      styles:{fontSize:8.5,cellPadding:2.5,textColor:[34,34,34],lineColor:[230,230,230]},
+      headStyles:{fillColor:[240,240,240],textColor:[100,100,100],fontStyle:'bold',fontSize:7.5},
+      columnStyles:{0:{cellWidth:cw*0.44},1:{cellWidth:cw*0.13,halign:'center'},2:{cellWidth:cw*0.15,halign:'center'},3:{cellWidth:cw*0.13,halign:'center'},4:{cellWidth:cw*0.15,halign:'center'}},
+      didParseCell(data) {
+        if (data.column.index===4 && data.section==='body') {
+          const v=parseInt(data.cell.raw);
+          data.cell.styles.textColor=v>=70?[45,138,78]:v>=50?[180,100,0]:[200,30,30];
+          data.cell.styles.fontStyle='bold';
+        }
+      }
+    });
+    y = doc.lastAutoTable.finalY + 8;
+
+    if (y > 240) { doc.addPage(); y = margin; }
+
+    // Session breakdown table
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(130,130,130);
+    doc.text('SESSION BREAKDOWN', margin, y); y += 4;
+    doc.autoTable({
+      startY: y, margin:{left:margin,right:margin},
+      head:[['Date','Type','Attempts','Landed','Rate']],
+      body: sessRows,
+      theme:'grid',
+      styles:{fontSize:8.5,cellPadding:2.5,textColor:[34,34,34],lineColor:[230,230,230]},
+      headStyles:{fillColor:[240,240,240],textColor:[100,100,100],fontStyle:'bold',fontSize:7.5},
+      columnStyles:{0:{cellWidth:cw*0.2},1:{cellWidth:cw*0.3},2:{cellWidth:cw*0.17,halign:'center'},3:{cellWidth:cw*0.17,halign:'center'},4:{cellWidth:cw*0.16,halign:'center'}},
+      didParseCell(data) {
+        if (data.column.index===4 && data.section==='body') {
+          const v=parseInt(data.cell.raw);
+          data.cell.styles.textColor=v>=70?[45,138,78]:v>=50?[180,100,0]:[200,30,30];
+          data.cell.styles.fontStyle='bold';
+        }
+      }
+    });
+
+    // Footer
+    const pg = doc.internal.getNumberOfPages();
+    for (let i=1;i<=pg;i++) {
+      doc.setPage(i);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(170,170,170);
+      doc.text('Generated '+new Date().toLocaleDateString('de-CH'), margin, 295);
+      doc.text(i+' / '+pg, W-margin, 295, {align:'right'});
+    }
+    doc.save(filename);
+  }
+
+  function loadAndGenerate() {
+    if (window.jspdf && window.jspdf.jsPDF) { generate(); return; }
+    const s1 = document.createElement('script');
+    s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s1.onload = () => {
+      const s2 = document.createElement('script');
+      s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
+      s2.onload = generate;
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s1);
+  }
+  loadAndGenerate();
+}
+
 
 function renderSessionReports() {
   const el = document.getElementById('session-reports-list');
@@ -1825,12 +2059,52 @@ function renderSessionReports() {
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
         <button onclick="openReportPrint(window._srReports[${idx}])" style="padding:6px 12px;border-radius:6px;background:rgba(57,195,212,0.15);border:1px solid #39c3d4;color:#39c3d4;font-family:'Poppins',sans-serif;font-size:12px;cursor:pointer;">View</button>
-        <button onclick="deleteSessionReport(${r.id},false)" title="Delete report only" style="padding:6px 8px;border-radius:6px;background:none;border:1px solid #e2001a33;color:#e2001a;font-size:13px;cursor:pointer;">🗑</button>
+<button onclick="deleteSessionReport(${r.id},false)" title="Delete report only" style="padding:6px 8px;border-radius:6px;background:none;border:1px solid #e2001a33;color:#e2001a;font-size:13px;cursor:pointer;">🗑</button>
         <button onclick="deleteSessionReport(${r.id},true)" title="Delete report + all trick data" style="padding:6px 8px;border-radius:6px;background:none;border:1px solid #e2001a;color:#e2001a;font-size:11px;cursor:pointer;font-weight:700;">🗑+</button>
       </div>
     </div>`;
   }).join('');
   window._srReports = dbSessionReports;
+  populateAthleteReportDropdown();
+}
+
+async function rebuildReportFromTimestamps(id, silent=false) {
+  const report = dbSessionReports.find(r => r.id === id);
+  if (!report) return;
+  if (!silent) showToast('Rebuilding…', 'success');
+  const athletes = Array.isArray(report.athletes) ? report.athletes : [];
+  const {data: entries, error} = await db.from('tricks')
+    .select('athlet,trickaufbau,gelandet,gesamt,created_at')
+    .eq('datum', report.datum)
+    .in('athlet', athletes)
+    .order('created_at', {ascending: true});
+  if (error || !entries) { showToast('Error: '+(error?.message||'no data'), 'error'); return; }
+
+  const athleteEntries = {};
+  entries.forEach(e => {
+    const name = e.athlet;
+    if (!athleteEntries[name]) athleteEntries[name] = [];
+    const result = (e.gesamt||0) >= 10 ? 'perfect' : e.gelandet==='Yes' ? 'landed' : 'miss';
+    athleteEntries[name].push({trick: e.trickaufbau||'—', result});
+  });
+
+  const existingNotes = {};
+  (report.trick_data||[]).forEach(a => { if (a.note) existingNotes[a.athlet] = a.note; });
+
+  const trickData = Object.entries(athleteEntries).map(([name, ents]) => {
+    const trickList = buildTrickBlocks(ents);
+    const totalAtt  = trickList.reduce((a,t)=>a+t.att,0);
+    const totalLand = trickList.reduce((a,t)=>a+t.land,0);
+    const note = existingNotes[shortName(name)] || '';
+    return {athlet: shortName(name), totalAtt, totalLand, tricks: trickList, note};
+  });
+
+  const {error: updErr} = await db.from('session_reports').update({trick_data: trickData}).eq('id', id);
+  if (updErr) { if (!silent) showToast('Error saving: '+updErr.message, 'error'); return; }
+  if (!silent) showToast('Report rebuilt from timestamps', 'success');
+  // Update local cache so the report is current without re-fetching
+  const idx = dbSessionReports.findIndex(r => r.id === id);
+  if (idx >= 0) dbSessionReports[idx].trick_data = trickData;
 }
 
 async function deleteSessionReport(id, withTricks) {
@@ -1871,10 +2145,9 @@ function renderDBRankings() {
   const maxB = sorted[0]?.[1] || 1;
   document.getElementById('rank-mastered').innerHTML = sorted.length ? sorted.map(([athlet, count], i) => {
     const pct = Math.round(count/maxB*100);
-    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
     return '<div style="flex:1;min-width:140px;max-width:200px;">'
       + '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">'
-      + '<span style="font-weight:700;color:var(--text);">' + medal + ' ' + shortName(athlet) + '</span>'
+      + '<span style="font-weight:700;color:var(--text);">' + shortName(athlet) + '</span>'
       + '<span style="color:var(--accent);font-weight:700;">' + count + '</span></div>'
       + '<div style="background:var(--border);border-radius:4px;height:6px;">'
       + '<div style="background:#39c3d4;width:'+ pct +'%;height:6px;border-radius:4px;transition:width .4s;"></div></div></div>';
@@ -2043,7 +2316,7 @@ function openTeamPdfReport() {
   <div class="print-btn"><button onclick="window.print()">Print / Save as PDF</button></div>
   <h1>Team Report — ${title}</h1>
   ${athleteSections}
-  <footer><span>Swiss-Ski Trick Analytics Snowboard</span><span>Generated ${today}</span></footer>
+  <footer><span>Swiss-Ski Trick Analyses Snowboard</span><span>Generated ${today}</span></footer>
 </body></html>`);
   win.document.close();
 }
@@ -2082,11 +2355,14 @@ function renderDBTable() {
     const isNewSession = !isStandort && t.trickaufbau && t.trickaufbau.includes(' — ');
     const trickDisplay = normSbTrick(isNewSession ? t.trickaufbau : (t.trickaufbau || desc));
     const sessionType  = t.typ || (t.disziplin ? badge(t.disziplin) : '–');
-    const resultBadge  = isNewSession
-      ? (t.gesamt >= 10 ? '<span style="font-size:11px;background:rgba(57,195,212,0.15);color:#39c3d4;border:1px solid #39c3d4;border-radius:4px;padding:2px 7px;font-weight:600;">⭐ PERFECT</span>'
-       : t.gesamt >= 7  ? '<span style="font-size:11px;background:rgba(45,138,78,0.15);color:#2d8a4e;border:1px solid #2d8a4e;border-radius:4px;padding:2px 7px;font-weight:600;">✓ LANDED</span>'
-       : '<span style="font-size:11px;background:rgba(226,0,26,0.12);color:#e2001a;border:1px solid #e2001a;border-radius:4px;padding:2px 7px;font-weight:600;">✗ MISS</span>')
-      : (t.gelandet === 'Yes' ? '✅' : t.gelandet === 'No' ? '❌' : '–');
+    const _pill = (lbl,bg,col,brd) => `<span style="font-size:11px;background:${bg};color:${col};border:1px solid ${brd};border-radius:4px;padding:2px 7px;font-weight:700;">${lbl}</span>`;
+    const resultBadge  = (t.gesamt >= 10)
+      ? _pill('S','rgba(57,195,212,0.15)','#39c3d4','#39c3d4')
+      : (t.gelandet === 'Yes')
+        ? _pill('L','rgba(45,138,78,0.15)','#2d8a4e','#2d8a4e')
+        : (t.gelandet === 'No')
+          ? _pill('F','rgba(226,0,26,0.12)','#e2001a','#e2001a')
+          : '–';
     return '<tr>'
       + '<td><strong>' + shortName(t.athlet) + '</strong>' + statusBadge + '</td>'
       + '<td>' + quelleBadge + '</td>'
@@ -2318,6 +2594,7 @@ const SESS_ALL_ATHLETES = [
   {name:'Jonas Hasler',squad:'PE'},
   {name:'Nicolas Schütz',squad:'PE'},
   {name:'Reef Hasler',squad:'PE'},
+  {name:'Robin Zürcher',squad:'PE'},
   {name:'Yuna Scheidegger',squad:'PE'},
 ];
 const SESS_SQUADS = [
@@ -2905,12 +3182,15 @@ function cancelSbEdit() {
 async function saveSbLogEdit(idx, newResult) {
   const e = sessLog[idx];
   if (!e) return;
+  const trickEl  = document.getElementById('sess-edit-trick');
   const commentEl = document.getElementById('sess-edit-comment');
+  const newTrick  = trickEl ? trickEl.value.trim() || e.trick : e.trick;
   const newComment = commentEl ? commentEl.value.trim() : (e.comment||'');
   const oldResult = e.result;
-  const ratingChanged = oldResult !== newResult;
+  const trickChanged   = newTrick !== e.trick;
+  const ratingChanged  = oldResult !== newResult;
   const commentChanged = newComment !== (e.comment||'');
-  if (!ratingChanged && !commentChanged) { cancelSbEdit(); return; }
+  if (!ratingChanged && !commentChanged && !trickChanged) { cancelSbEdit(); return; }
   const d = sessAthleteData[e.name];
   if (ratingChanged && d) {
     if (oldResult!=='miss') d.stats.landed--;
@@ -2918,28 +3198,32 @@ async function saveSbLogEdit(idx, newResult) {
     if (newResult!=='miss') d.stats.landed++;
     if (newResult==='perfect') d.stats.perfect++;
   }
+  if (trickChanged) e.trick = newTrick;
   e.result = newResult;
   e.comment = newComment;
   if (e.dbId) {
     const gesamt = newResult==='miss'?3:newResult==='landed'?7:10;
-    await db.from('tricks').update({
-      gesamt, ausfuehrung:gesamt, landung:gesamt, setup:gesamt,
-      gelandet:newResult==='miss'?'No':'Yes',
-      kommentar: newComment || null
-    }).eq('id', e.dbId);
+    const upd = { gesamt, ausfuehrung:gesamt, landung:gesamt, setup:gesamt,
+      gelandet:newResult==='miss'?'No':'Yes', kommentar: newComment||null };
+    if (trickChanged) upd.trickaufbau = newTrick;
+    await db.from('tricks').update(upd).eq('id', e.dbId);
+    if (trickChanged) syncTrickNameLocally(e.dbId, newTrick);
   }
   sessEditIdx = -1;
   renderLiveSession();
   renderSessionLog();
   saveSessionState();
-  showToast('Rating updated', 'success');
+  showToast('Updated', 'success');
 }
 
 function renderSessionLog() {
   const el = document.getElementById('sess-log');
   if (!el) return;
   if (!sessLog.length) { el.innerHTML=''; return; }
-  el.innerHTML = sessLog.slice(0,30).map((e,i)=>{
+  const filtered = sessActiveSbAthlete
+    ? sessLog.map((e,i)=>({...e,_i:i})).filter(e=>e.name===sessActiveSbAthlete)
+    : sessLog.map((e,i)=>({...e,_i:i}));
+  el.innerHTML = filtered.slice(0,30).map(e=>{ const i=e._i;
     const icon = e.result==='miss'?'✗':e.result==='landed'?'✓':'⭐';
     const c = e.result==='miss'?'#e2001a':e.result==='landed'?'#2d8a4e':'#39c3d4';
     const isEditing = sessEditIdx === i;
@@ -2947,6 +3231,9 @@ function renderSessionLog() {
     if (isEditing) {
       const btnStyle = (val,col,bg) => `padding:8px 14px;border-radius:8px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:2px solid ${col};background:${e.result===val?col:'transparent'};color:${e.result===val?'#060f1a':col};`;
       editRow = `<div style="padding:8px 12px 4px 38px;">
+        <div style="margin-bottom:8px;">
+          <input type="text" id="sess-edit-trick" value="${(e.trick||'').replace(/"/g,'&quot;')}" placeholder="Trick name" style="width:100%;padding:6px 10px;border-radius:6px;border:1px solid #39c3d4;background:var(--surface2);color:var(--text);font-size:12px;font-family:'Poppins',sans-serif;">
+        </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
           <button onclick="saveSbLogEdit(${i},'miss')" style="${btnStyle('miss','#e2001a','rgba(226,0,26,0.15)')}">✗ Failed</button>
           <button onclick="saveSbLogEdit(${i},'landed')" style="${btnStyle('landed','#2d8a4e','rgba(45,138,78,0.15)')}">✓ Landed</button>
@@ -3098,21 +3385,38 @@ async function submitSessionReport(duration) {
   await saveSessionReport(duration, location, conditions, comments, athleteNotes);
 }
 
-async function saveSessionReport(duration, location, conditions, comments, athleteNotes) {
-  const athleteMap = {};
-  sessLog.forEach(e => {
-    if (!athleteMap[e.name]) athleteMap[e.name] = {};
+function buildTrickBlocks(entries) {
+  // entries = [{trick, result}] in chronological order
+  // Returns array of {trick, att, land, stomped} blocks
+  // A new block starts whenever the trick changes and then comes back
+  const blocks = [];
+  entries.forEach(e => {
     const trick = e.trick || '—';
-    if (!athleteMap[e.name][trick]) athleteMap[e.name][trick] = {att:0,land:0,stomped:0};
-    athleteMap[e.name][trick].att++;
-    if (e.result !== 'miss') athleteMap[e.name][trick].land++;
-    if (e.result === 'perfect') athleteMap[e.name][trick].stomped++;
+    const last = blocks[blocks.length - 1];
+    if (last && last.trick === trick) {
+      last.att++;
+      if (e.result !== 'miss') last.land++;
+      if (e.result === 'perfect') last.stomped++;
+    } else {
+      blocks.push({trick, att:1, land:e.result!=='miss'?1:0, stomped:e.result==='perfect'?1:0});
+    }
   });
-  const trickData = Object.entries(athleteMap).map(([name, tricks]) => {
-    const trickList = Object.entries(tricks).map(([trick, s]) => ({trick, att:s.att, land:s.land, stomped:s.stomped}));
-    const totalAtt = trickList.reduce((a,t)=>a+t.att,0);
+  return blocks;
+}
+
+async function saveSessionReport(duration, location, conditions, comments, athleteNotes) {
+  const athleteEntries = {};
+  // sessLog is newest-first (unshift), reverse to get chronological order
+  sessLog.slice().reverse().forEach(e => {
+    if (!athleteEntries[e.name]) athleteEntries[e.name] = [];
+    athleteEntries[e.name].push({trick: e.trick||'—', result: e.result});
+  });
+  const trickData = Object.entries(athleteEntries).map(([name, entries]) => {
+    const trickList = buildTrickBlocks(entries);
+    const totalAtt  = trickList.reduce((a,t)=>a+t.att,0);
     const totalLand = trickList.reduce((a,t)=>a+t.land,0);
-    return {athlet: shortName(name), totalAtt, totalLand, tricks: trickList};
+    const note = (athleteNotes||{})[shortName(name)] || '';
+    return {athlet: shortName(name), totalAtt, totalLand, tricks: trickList, note};
   });
 
   const {error} = await db.from('session_reports').insert({
@@ -3124,8 +3428,7 @@ async function saveSessionReport(duration, location, conditions, comments, athle
     location,
     conditions,
     comments,
-    trick_data: trickData,
-    athlete_notes: athleteNotes || {}
+    trick_data: trickData
   });
 
   if (error) { showToast('Error saving report: ' + error.message, 'error'); }
@@ -3149,71 +3452,165 @@ function openReportPrint(report) {
   const dateStr = d.datum ? (() => { const p=d.datum.split('-'); return p[2]+'.'+p[1]+'.'+p[0].slice(2); })() : '';
   const durH = d.duration_min ? (d.duration_min/60).toFixed(1).replace('.0','')+'h' : '—';
   const condLabel = d.conditions ? ['','Poor','Below Average','Average','Good','Excellent'][d.conditions]||d.conditions+'/5' : '—';
-  const condDots = d.conditions ? ('● '.repeat(d.conditions) + '○ '.repeat(5-d.conditions)).trim() : '—';
-  const typeShort = {'Landing Bag':'Landing Bag','Jump On-Snow':'Jump On-Snow','Big Air Competition':'Big Air Competition'}[d.session_type]||d.session_type||'—';
-  const athletes = Array.isArray(d.athletes) ? d.athletes.join(', ') : (d.athletes||'');
-  const tricks = Array.isArray(d.trick_data) ? d.trick_data : [];
+  const condDots = d.conditions ? (d.conditions+'/5') : '—';
+  const typeShort = d.session_type||'—';
+  const athleteStr = Array.isArray(d.athletes) ? d.athletes.map(a=>shortName(a)).join(', ') : (d.athletes||'');
+  const trickData = Array.isArray(d.trick_data) ? d.trick_data : [];
+  const filename = 'Session_Report_' + (d.datum||'').replace(/-/g,'') + '.pdf';
 
-  const athleteSections = tricks.map(a => {
-    const pct = a.totalAtt ? Math.round(a.totalLand/a.totalAtt*100) : 0;
-    const rows = (a.tricks||[]).map(t => {
-      const lp = t.att ? Math.round(t.land/t.att*100) : 0;
-      const landedOnly = t.land - (t.stomped||0);
-      return `<tr><td>${normSbTrick(t.trick)}</td><td>${t.att}</td><td>${landedOnly}</td><td>${t.stomped||0}</td><td>${lp}%</td></tr>`;
-    }).join('');
-    return `<div class="athlete-block">
-      <div class="athlete-name">${a.athlet}</div>
-      <div class="athlete-summary">${a.totalAtt} attempts &nbsp;|&nbsp; ${a.totalLand} landed+stomped &nbsp;|&nbsp; ${pct}%</div>
-      <table><thead><tr><th>Trick</th><th>Att.</th><th>Landed</th><th>Stomped</th><th>Rate</th></tr></thead><tbody>${rows}</tbody></table>
-    </div>`;
-  }).join('');
+  showToast('Generating PDF…', 'success');
 
-  const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
-<title>Session Report — ${dateStr}</title>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a;background:#fff;padding:32px 40px;max-width:860px;margin:0 auto;font-size:13px;line-height:1.5;}
-  .print-btn{margin-bottom:28px;}
-  .print-btn button{padding:9px 22px;background:#1a1a1a;color:#fff;border:none;border-radius:4px;font-size:13px;font-family:inherit;cursor:pointer;letter-spacing:.3px;}
-  header{border-bottom:2px solid #1a1a1a;padding-bottom:16px;margin-bottom:20px;}
-  header h1{font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;}
-  .meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 16px;}
-  .meta-item label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#777;margin-bottom:2px;}
-  .meta-item span{font-size:14px;font-weight:600;}
-  .section-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#777;margin:20px 0 8px;border-top:1px solid #e0e0e0;padding-top:12px;}
-  .comments{background:#f6f6f6;border-left:3px solid #1a1a1a;padding:10px 14px;font-size:13px;color:#333;margin-bottom:16px;}
-  .athlete-block{margin-bottom:20px;border:1px solid #e0e0e0;border-radius:4px;overflow:hidden;}
-  .athlete-name{background:#1a1a1a;color:#fff;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;}
-  .athlete-summary{padding:6px 12px;font-size:12px;color:#555;background:#f9f9f9;border-bottom:1px solid #e0e0e0;}
-  table{width:100%;border-collapse:collapse;}
-  th{background:#f0f0f0;padding:7px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555;}
-  td{padding:7px 12px;border-top:1px solid #eee;font-size:12px;color:#222;}
-  tr:hover td{background:#fafafa;}
-  footer{margin-top:32px;border-top:1px solid #ddd;padding-top:12px;font-size:11px;color:#aaa;display:flex;justify-content:space-between;}
-  @media print{.print-btn{display:none;} body{padding:20px;}}
-</style></head><body>
-  <div class="print-btn"><button onclick="window.print()">Print / Save as PDF</button></div>
-  <header>
-    <h1>Session Report</h1>
-    <div class="meta-grid">
-      <div class="meta-item"><label>Date</label><span>${dateStr}</span></div>
-      <div class="meta-item"><label>Session Type</label><span>${typeShort}</span></div>
-      <div class="meta-item"><label>Duration</label><span>${durH}</span></div>
-      <div class="meta-item"><label>Location</label><span>${d.location||'—'}</span></div>
-      <div class="meta-item"><label>Conditions</label><span>${condDots} &nbsp; ${condLabel}</span></div>
-      <div class="meta-item"><label>Athletes</label><span>${athletes}</span></div>
-    </div>
-  </header>
-  ${d.comments ? `<div class="section-label">Coach Comments</div><div class="comments">${d.comments.replace(/\n/g,'<br>')}</div>` : ''}
-  <div class="section-label">Trick Performance by Athlete</div>
-  ${athleteSections || '<div style="color:#888;padding:12px 0;">No trick data recorded.</div>'}
-  <footer>
-    <span>Swiss-Ski Trick Analytics</span>
-    <span>Generated ${new Date().toLocaleDateString('en-GB')}</span>
-  </footer>
-</body></html>`);
-  win.document.close();
+  function generate() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
+    const W = 210, margin = 16, cw = W - margin*2;
+    let y = margin;
+
+    // Header bar
+    doc.setFillColor(26,26,26);
+    doc.rect(margin, y, cw, 10, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255,255,255);
+    doc.text('SESSION REPORT', margin+4, y+6.8);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.setTextColor(180,180,180);
+    doc.text('Swiss-Ski Trick Analyses — Snowboard', W-margin-2, y+6.8, {align:'right'});
+    y += 14;
+
+    // Meta grid (2 columns)
+    const meta = [
+      ['Date', dateStr], ['Session Type', typeShort], ['Duration', durH],
+      ['Location', d.location||'—'], ['Conditions', condDots+' '+condLabel], ['Athletes', athleteStr]
+    ];
+    doc.setFontSize(7.5);
+    const col = cw/3;
+    meta.forEach(([label, val], i) => {
+      const cx = margin + (i%3)*col;
+      const cy = y + Math.floor(i/3)*11;
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(130,130,130);
+      doc.text(label.toUpperCase(), cx, cy);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(26,26,26);
+      doc.text(String(val), cx, cy+4.5);
+    });
+    y += 26;
+
+    // Divider
+    doc.setDrawColor(220,220,220);
+    doc.line(margin, y, W-margin, y);
+    y += 5;
+
+    // Comments
+    if (d.comments) {
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(130,130,130);
+      doc.text('COACH COMMENTS', margin, y);
+      y += 4;
+      doc.setFillColor(246,246,246);
+      const lines = doc.splitTextToSize(d.comments, cw-8);
+      const bh = lines.length*4.5+5;
+      doc.rect(margin, y, cw, bh, 'F');
+      doc.setFillColor(26,26,26);
+      doc.rect(margin, y, 2, bh, 'F');
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(9);
+      doc.setTextColor(60,60,60);
+      doc.text(lines, margin+5, y+4.5);
+      y += bh+5;
+    }
+
+    // Per-athlete tables
+    trickData.forEach(a => {
+      const pct = a.totalAtt ? Math.round(a.totalLand/a.totalAtt*100) : 0;
+      if (y > 250) { doc.addPage(); y = margin; }
+
+      // Athlete name bar
+      doc.setFillColor(26,26,26);
+      doc.rect(margin, y, cw, 8, 'F');
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(9);
+      doc.setTextColor(255,255,255);
+      doc.text((a.athlet||'').toUpperCase(), margin+3, y+5.5);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(8);
+      doc.setTextColor(180,180,180);
+      doc.text(`${a.totalAtt} att.  |  ${a.totalLand} landed+stomped  |  ${pct}%`, W-margin-3, y+5.5, {align:'right'});
+      y += 9;
+
+      // Trick table
+      const rows = (a.tricks||[]).map(t => {
+        const lp = t.att ? Math.round(t.land/t.att*100) : 0;
+        return [normSbTrick(t.trick), t.att, t.land-(t.stomped||0), t.stomped||0, lp+'%'];
+      });
+
+      doc.autoTable({
+        startY: y,
+        margin: {left:margin, right:margin},
+        head: [['Trick','Att.','Landed','Stomped','Rate']],
+        body: rows,
+        theme: 'grid',
+        styles: {fontSize:8.5, cellPadding:2.5, textColor:[34,34,34], lineColor:[230,230,230]},
+        headStyles: {fillColor:[240,240,240], textColor:[100,100,100], fontStyle:'bold', fontSize:7.5},
+        columnStyles: {0:{cellWidth:cw*0.42}, 1:{cellWidth:cw*0.13,halign:'center'}, 2:{cellWidth:cw*0.15,halign:'center'}, 3:{cellWidth:cw*0.15,halign:'center'}, 4:{cellWidth:cw*0.15,halign:'center'}},
+        didParseCell(data) {
+          if (data.column.index===4 && data.section==='body') {
+            const v = parseInt(data.cell.raw);
+            data.cell.styles.textColor = v>=70?[45,138,78]:v>=50?[180,100,0]:[200,30,30];
+            data.cell.styles.fontStyle = 'bold';
+          }
+        }
+      });
+      y = doc.lastAutoTable.finalY + 2;
+
+      // Note
+      if (a.note) {
+        doc.setFillColor(255,251,235);
+        const noteLines = doc.splitTextToSize('Note: '+a.note, cw-8);
+        const nh = noteLines.length*4+5;
+        doc.rect(margin, y, cw, nh, 'F');
+        doc.setDrawColor(230,215,150);
+        doc.rect(margin, y, cw, nh, 'S');
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(8);
+        doc.setTextColor(100,80,20);
+        doc.text(noteLines, margin+3, y+4);
+        y += nh+2;
+      }
+      y += 4;
+    });
+
+    // Footer
+    const pg = doc.internal.getNumberOfPages();
+    for (let i=1;i<=pg;i++) {
+      doc.setPage(i);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(170,170,170);
+      doc.text('Generated '+new Date().toLocaleDateString('de-CH'), margin, 295);
+      doc.text(`${i} / ${pg}`, W-margin, 295, {align:'right'});
+    }
+
+    doc.save(filename);
+  }
+
+  function loadAndGenerate() {
+    if (window.jspdf && window.jspdf.jsPDF) { generate(); return; }
+    const s1 = document.createElement('script');
+    s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s1.onload = () => {
+      const s2 = document.createElement('script');
+      s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
+      s2.onload = generate;
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s1);
+  }
+
+  loadAndGenerate();
 }
 
 async function viewSessionReportByDate(date) {
@@ -3644,7 +4041,7 @@ async function loadEntwicklung() {
   const standort = standortRes.data || [];
 
   if (!tricks.length && !standort.length) {
-    main.innerHTML = '<div class="empty-state"><div class="icon">📋</div>No entries yet für diese Athlete</div>';
+    main.innerHTML = '<div class="empty-state">No entries yet für diese Athlete</div>';
     return;
   }
 
@@ -4846,8 +5243,24 @@ function renderSbTrickAnalytics() {
 
     if (radarTotal > 0) requestAnimationFrame(() => drawSessionDirRadar('sess-dir-radar', dirCnt, SB_DIRS, SB_DIR_COL));
 
-    // Add "View Session Report" button for individual sessions
+    // Load athlete notes from session report
     const sessionDate = filterDate;
+    db.from('session_reports').select('trick_data,comments').eq('app','snowboard').eq('datum',sessionDate).limit(1).then(({data:reps})=>{
+      if (!reps||!reps[0]) return;
+      const rep = reps[0];
+      const notes = (rep.trick_data||[]).filter(a=>a.note).map(a=>
+        `<div style="display:flex;gap:8px;align-items:baseline;margin-bottom:4px;"><span style="font-weight:600;color:#39c3d4;min-width:70px;">${a.athlet}</span><span style="color:var(--text);font-size:12px;">${a.note}</span></div>`
+      ).join('');
+      if (notes || rep.comments) {
+        const notesDiv = document.createElement('div');
+        notesDiv.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:10px;';
+        notesDiv.innerHTML = `<div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Coach Notes</div>`
+          + (rep.comments ? `<div style="color:var(--text);font-size:12px;margin-bottom:8px;padding:6px 10px;background:rgba(57,195,212,0.06);border-radius:6px;">${rep.comments}</div>` : '')
+          + notes;
+        el.appendChild(notesDiv);
+      }
+    });
+
     const reportBtnDiv = document.createElement('div');
     reportBtnDiv.style.cssText = 'margin-top:12px;text-align:center;';
     reportBtnDiv.innerHTML = `<button onclick="viewSessionReportByDate('${sessionDate}')" style="padding:10px 22px;border-radius:8px;background:rgba(57,195,212,0.15);border:1px solid #39c3d4;color:#39c3d4;font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">📄 View Session Report</button>`;
@@ -5063,18 +5476,84 @@ function renderSbRawEntries(entries, subtitle) {
         <span style="font-size:11px;opacity:.6;">Inspect or delete entries</span>
       </button>
       <div id="ev-raw-list" style="display:${wasOpen?'block':'none'};max-height:420px;overflow-y:auto;">
-        ${sorted.length ? sorted.map(e=>`
-          <div id="ev-raw-row-${e.id}" style="display:grid;grid-template-columns:60px 48px 1fr 80px 32px;align-items:center;gap:8px;padding:8px 14px;border-top:1px solid var(--border);font-size:11px;">
+        ${sorted.length ? sorted.map(e=>{
+          const ts = e.created_at ? new Date(e.created_at).toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Zurich'}) : '';
+          const isEditing = _sbRawEditId === e.id;
+          const curResult = (e.gesamt||0)>=10?'perfect':e.gelandet==='Yes'?'landed':'miss';
+          const editForm = isEditing ? `
+            <div style="grid-column:1/-1;padding:8px 0 4px;display:flex;flex-direction:column;gap:6px;">
+              <input id="raw-edit-trick-${e.id}" type="text" value="${(e.trickaufbau||'').replace(/"/g,'&quot;')}"
+                style="width:100%;padding:6px 10px;border-radius:6px;border:1px solid #39c3d4;background:var(--surface2);color:var(--text);font-size:12px;font-family:'Poppins',sans-serif;">
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <select id="raw-edit-result-${e.id}" style="padding:5px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-family:'Poppins',sans-serif;">
+                  <option value="miss" ${curResult==='miss'?'selected':''}>✗ Failed</option>
+                  <option value="landed" ${curResult==='landed'?'selected':''}>✓ Landed</option>
+                  <option value="perfect" ${curResult==='perfect'?'selected':''}>⭐ Stomped</option>
+                </select>
+                <button onclick="saveSbRawEdit(${e.id})" style="padding:5px 12px;border-radius:6px;background:#39c3d4;border:none;color:#060f1a;font-size:12px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">Save</button>
+                <button onclick="cancelSbRawEdit()" style="padding:5px 12px;border-radius:6px;background:none;border:1px solid var(--border);color:var(--muted);font-size:12px;cursor:pointer;font-family:'Poppins',sans-serif;">Cancel</button>
+              </div>
+            </div>` : '';
+          return `
+          <div id="ev-raw-row-${e.id}" style="display:grid;grid-template-columns:60px 36px 48px 1fr 80px 28px 28px;align-items:center;gap:8px;padding:8px 14px;border-top:1px solid var(--border);font-size:11px;${isEditing?'background:rgba(57,195,212,0.06);':''};flex-wrap:wrap;">
             <span style="color:var(--muted);">${fmtDate(e.datum)}</span>
+            <span style="color:var(--muted);font-size:10px;">${ts}</span>
             <span style="color:var(--muted);font-size:10px;">${typShort(e.typ)}</span>
             <span style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${normSbTrick(e.trickaufbau||'')}">${normSbTrick(e.trickaufbau||'—')}</span>
             <span>${resultBadge(e)}</span>
+            <button onclick="editSbRawEntry(${e.id})" title="Edit entry"
+              style="background:none;border:1px solid ${isEditing?'#39c3d4':'var(--border)'};border-radius:6px;color:${isEditing?'#39c3d4':'var(--muted)'};cursor:pointer;font-size:11px;padding:2px 5px;line-height:1;">✏</button>
             <button onclick="deleteSbRawEntry(${e.id})" title="Delete entry"
               style="background:none;border:1px solid #e2001a33;border-radius:6px;color:#e2001a;cursor:pointer;font-size:13px;padding:2px 6px;line-height:1;">🗑</button>
-          </div>`).join('')
+            ${editForm}
+          </div>`;
+        }).join('')
         : '<div style="padding:16px;text-align:center;color:var(--muted);font-size:12px;">No entries for this selection.</div>'}
       </div>
     </div>`;
+}
+
+function syncTrickNameLocally(dbId, newTrick) {
+  const i = dbAllTricks.findIndex(t => t.id === dbId);
+  if (i >= 0) dbAllTricks[i].trickaufbau = newTrick;
+  const j = _sbTaData.findIndex(t => t.id === dbId);
+  if (j >= 0) _sbTaData[j].trickaufbau = normSbTrick(newTrick);
+  sessLog.forEach(e => { if (e.dbId === dbId) e.trick = newTrick; });
+}
+
+let _sbRawEditId = null;
+
+function editSbRawEntry(id) {
+  _sbRawEditId = _sbRawEditId === id ? null : id;
+  renderSbTrickAnalytics();
+}
+
+function cancelSbRawEdit() {
+  _sbRawEditId = null;
+  renderSbTrickAnalytics();
+}
+
+async function saveSbRawEdit(id) {
+  const trickInput = document.getElementById('raw-edit-trick-'+id);
+  const newTrick = trickInput ? trickInput.value.trim() : '';
+  const resultSel = document.getElementById('raw-edit-result-'+id);
+  const newResult = resultSel ? resultSel.value : '';
+  if (!newTrick) { showToast('Trick name cannot be empty', 'error'); return; }
+
+  const gesamt = newResult==='miss'?3:newResult==='landed'?7:10;
+  const {error} = await db.from('tricks').update({
+    trickaufbau: newTrick,
+    gesamt, ausfuehrung:gesamt, landung:gesamt, setup:gesamt,
+    gelandet: newResult==='miss'?'No':'Yes'
+  }).eq('id', id);
+  if (error) { showToast('Error: '+error.message, 'error'); return; }
+
+  syncTrickNameLocally(id, newTrick);
+  _sbRawEditId = null;
+  renderSbTrickAnalytics();
+  renderSessionLog();
+  saveSessionState();
+  showToast('Entry updated', 'success');
 }
 
 async function deleteSbRawEntry(id) {
@@ -5255,10 +5734,8 @@ function renderSbSessionPerformance() {
   }
 
   el.innerHTML = `
-    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;display:flex;flex-direction:column;gap:3px;">
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
       <span>All recorded tricks per athlete, grouped by direction</span>
-      <span>Ampel: (✓ landed + ⭐ stomped) / total</span>
-      <span>🟢 ≥70% &nbsp;&nbsp; 🟡 ≥50% &nbsp;&nbsp; 🔴 &lt;50%</span>
     </div>
     <div>
       ${athList.map(athlet => {
@@ -5276,8 +5753,7 @@ function renderSbSessionPerformance() {
           byDir[d].sort(([,a],[,b]) => {
             const lA=a.att?Math.round(a.land/a.att*100):0;
             const lB=b.att?Math.round(b.land/b.att*100):0;
-            const rank={'🟢':0,'🟡':1,'🔴':2};
-            return (rank[sbPerfStatus(lA).icon]||0)-(rank[sbPerfStatus(lB).icon]||0) || b.rot-a.rot;
+            return lB-lA || b.rot-a.rot;
           });
         });
 
@@ -5290,12 +5766,14 @@ function renderSbSessionPerformance() {
               const landedOnly = s.land - s.stomped;
               const st  = sbPerfStatus(landPct);
               const colL = landPct>=70?'#2d8a4e':landPct>=50?'#f59e0b':'#e2001a';
+              const failed = s.att - s.land;
               return `<div style="background:${bkg[st.icon]};border:1px solid ${brd[st.icon]};border-radius:8px;padding:6px 10px;margin-bottom:5px;">
-                <div style="font-size:12px;color:var(--text);">${st.icon} ${normSbTrick(trick)}</div>
-                <div style="display:flex;align-items:center;gap:8px;margin-top:4px;font-size:11px;font-weight:700;">
+                <div style="font-size:12px;color:var(--text);">${normSbTrick(trick)}</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:4px;font-size:11px;font-weight:700;flex-wrap:wrap;">
                   <span style="color:${colL};">${landPct}%</span>
-                  <span style="color:#2d8a4e;">✓&nbsp;${landedOnly}</span>
-                  <span style="color:#39c3d4;font-size:11px;">&#11088;&nbsp;${s.stomped}</span>
+                  <span style="color:#e2001a;">F&nbsp;${failed}</span>
+                  <span style="color:#2d8a4e;">L&nbsp;${landedOnly}</span>
+                  <span style="color:#39c3d4;">S&nbsp;${s.stomped}</span>
                   <span style="color:var(--muted);font-weight:400;">/ ${s.att}</span>
                 </div>
               </div>`;
